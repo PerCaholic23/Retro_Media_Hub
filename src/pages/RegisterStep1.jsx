@@ -1,7 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 function RegisterStep1() {
   const navigate = useNavigate();
+
+  const [phone, setPhone] = useState("");
 
   const inputStyle =
     "w-full px-4 py-3 rounded-xl bg-[#f9f1ef] border border-[#faa268] focus:outline-none focus:ring-2 focus:ring-[#f99146]";
@@ -15,10 +18,36 @@ function RegisterStep1() {
         </h2>
 
         <div className="space-y-4">
-          <input type="text" placeholder="Username" className={inputStyle} />
-          <input type="email" placeholder="Email" className={inputStyle} />
-          <input type="tel" placeholder="Phone" className={inputStyle} />
-          <input type="password" placeholder="Password" className={inputStyle} />
+          <input
+            type="text"
+            placeholder="Username"
+            className={inputStyle}
+          />
+
+          <input
+            type="email"
+            placeholder="Email"
+            className={inputStyle}
+          />
+
+          <input
+            type="text"
+            placeholder="Phone"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={phone}
+            onChange={(e) =>
+              setPhone(e.target.value.replace(/[^0-9]/g, ""))
+            }
+            className={inputStyle}
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            className={inputStyle}
+          />
+
           <input
             type="password"
             placeholder="Confirm Password"

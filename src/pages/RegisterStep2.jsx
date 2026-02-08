@@ -1,7 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 function RegisterStep2() {
   const navigate = useNavigate();
+
+  const [postalCode, setPostalCode] = useState("");
 
   const inputStyle =
     "w-full px-4 py-3 rounded-xl bg-[#f9f1ef] border border-[#faa268] focus:outline-none focus:ring-2 focus:ring-[#f99146]";
@@ -15,7 +18,11 @@ function RegisterStep2() {
         </h2>
 
         <div className="space-y-4">
-          <input type="text" placeholder="Full Name" className={inputStyle} />
+          <input
+            type="text"
+            placeholder="Full Name"
+            className={inputStyle}
+          />
 
           <input
             type="text"
@@ -29,19 +36,37 @@ function RegisterStep2() {
             className={inputStyle}
           />
 
-          <input type="text" placeholder="Province" className={inputStyle} />
+          <input
+            type="text"
+            placeholder="Province"
+            className={inputStyle}
+          />
 
           <div className="grid grid-cols-2 gap-4">
-            <input type="text" placeholder="District" className={inputStyle} />
+            <input
+              type="text"
+              placeholder="District"
+              className={inputStyle}
+            />
+
             <input
               type="text"
               placeholder="Postal Code"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={5}
+              value={postalCode}
+              onChange={(e) =>
+                setPostalCode(e.target.value.replace(/[^0-9]/g, ""))
+              }
               className={inputStyle}
             />
           </div>
         </div>
 
-        <button className="w-full mt-8 bg-[#f99146] text-white py-3 rounded-xl font-medium hover:bg-[#f47f2a] transition">
+        <button
+          className="w-full mt-8 bg-[#f99146] text-white py-3 rounded-xl font-medium hover:bg-[#f47f2a] transition"
+        >
           Confirm
         </button>
 
