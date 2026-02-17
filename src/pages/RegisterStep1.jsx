@@ -14,25 +14,25 @@ function RegisterStep1() {
       <div className="w-full max-w-md bg-[#f6d5cd] rounded-3xl shadow-xl p-8">
 
         <h2 className="text-2xl font-bold text-center mb-6">
-          Register
+          สมัครสมาชิก
         </h2>
 
         <div className="space-y-4">
           <input
             type="text"
-            placeholder="Username"
+            placeholder="ชื่อผู้ใช้"
             className={inputStyle}
           />
 
           <input
             type="email"
-            placeholder="Email"
+            placeholder="อีเมล"
             className={inputStyle}
           />
 
           <input
             type="text"
-            placeholder="Phone"
+            placeholder="เบอร์โทรศัพท์"
             inputMode="numeric"
             pattern="[0-9]*"
             value={phone}
@@ -44,13 +44,13 @@ function RegisterStep1() {
 
           <input
             type="password"
-            placeholder="Password"
+            placeholder="รหัสผ่าน"
             className={inputStyle}
           />
 
           <input
             type="password"
-            placeholder="Confirm Password"
+            placeholder="ยืนยันรหัสผ่าน"
             className={inputStyle}
           />
         </div>
@@ -59,16 +59,16 @@ function RegisterStep1() {
           onClick={() => navigate("/register/step2")}
           className="w-full mt-6 bg-[#f99146] text-white py-3 rounded-xl font-medium hover:bg-[#f47f2a] transition"
         >
-          Next
+          ถัดไป
         </button>
 
         <p className="text-center text-sm text-gray-700 mt-6">
-          Already have an account?{" "}
+          มีบัญชีอยู่แล้ว?{" "}
           <span
             onClick={() => navigate("/login")}
             className="font-medium cursor-pointer underline"
           >
-            Login
+            เข้าสู่ระบบ
           </span>
         </p>
 

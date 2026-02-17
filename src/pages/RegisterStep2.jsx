@@ -14,44 +14,44 @@ function RegisterStep2() {
       <div className="w-full max-w-lg bg-[#f6d5cd] rounded-3xl shadow-xl p-8">
 
         <h2 className="text-2xl font-bold text-center mb-6">
-          Address Information
+          ข้อมูลที่อยู่
         </h2>
 
         <div className="space-y-4">
           <input
             type="text"
-            placeholder="Full Name"
+            placeholder="ชื่อ-นามสกุล"
             className={inputStyle}
           />
 
           <input
             type="text"
-            placeholder="House No. / Building / Village"
+            placeholder="บ้านเลขที่ / อาคาร / หมู่บ้าน"
             className={inputStyle}
           />
 
           <input
             type="text"
-            placeholder="Street / Sub-district"
+            placeholder="ถนน / ตำบล"
             className={inputStyle}
           />
 
           <input
             type="text"
-            placeholder="Province"
+            placeholder="จังหวัด"
             className={inputStyle}
           />
 
           <div className="grid grid-cols-2 gap-4">
             <input
               type="text"
-              placeholder="District"
+              placeholder="อำเภอ / เขต"
               className={inputStyle}
             />
 
             <input
               type="text"
-              placeholder="Postal Code"
+              placeholder="รหัสไปรษณีย์"
               inputMode="numeric"
               pattern="[0-9]*"
               maxLength={5}
@@ -67,14 +67,14 @@ function RegisterStep2() {
         <button
           className="w-full mt-8 bg-[#f99146] text-white py-3 rounded-xl font-medium hover:bg-[#f47f2a] transition"
         >
-          Confirm
+          ยืนยันข้อมูล
         </button>
 
         <button
           onClick={() => navigate("/register/step1")}
           className="w-full mt-3 text-sm text-gray-800 underline"
         >
-          ← Back
+          ← ย้อนกลับ
         </button>
 
       </div>
