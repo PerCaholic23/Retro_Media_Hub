@@ -68,3 +68,29 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+# Orange App
+
+## วิธีติดตั้ง
+
+1. Clone โปรเจค
+2. ติดตั้ง dependency
+
+Backend
+cd backend
+npm install
+
+Frontend
+cd frontend
+npm install
+
+3. สร้างไฟล์ .env ในโฟลเดอร์ backend (ดูจาก .env.example)
+
+4. สร้าง database ชื่อ orangeapp
+5. Import ไฟล์ database.sql
+
+6. รัน backend
+npm start
+
+7. รัน frontend
+npm start
