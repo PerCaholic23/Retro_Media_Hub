@@ -102,6 +102,7 @@ router.post("/login", (req, res) => {
         fullName: user.fullName,
         email: user.email,
         phone: user.phone,
+        
       },
     });
   });
@@ -138,4 +139,29 @@ router.get("/profile", verifyToken, (req, res) => {
   });
 });
 
+router.get("/profile/:id", (req, res) => {
+  const { id } = req.params;
+
+  db.query(
+    `SELECT 
+      id,
+      username,
+      fullName,
+      email,
+      phone,
+      house,
+      road,
+      subdistrict,
+      district,
+      province,
+      postalCode
+     FROM users 
+     WHERE id = ?`,
+    [id],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      res.json(result[0]);
+    }
+  );
+});
 module.exports = router;

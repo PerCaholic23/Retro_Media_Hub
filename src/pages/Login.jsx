@@ -26,8 +26,12 @@ function Login() {
         }
       );
 
-      // เก็บ token
+      // ✅ เก็บ token
       localStorage.setItem("token", res.data.token);
+
+      // ✅ เก็บ user (สำคัญมาก)
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      
 
       alert(res.data.message);
 
