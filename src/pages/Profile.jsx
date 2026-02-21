@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../components/Navbar";
+
 
 export default function Profile() {
   const [user, setUser] = useState({});
@@ -25,7 +25,7 @@ export default function Profile() {
     <div className="bg-[#e9eff3] min-h-screen font-prompt">
       
       {/* ✅ ใช้ Navbar แทน nav เก่า */}
-      <Navbar />
+     
 
       {/* PROFILE CONTENT */}
       <div className="p-20">
@@ -67,10 +67,11 @@ export default function Profile() {
             <button className="bg-orange-400 text-white px-10 py-3 rounded-xl shadow-md hover:scale-105 transition">
               ยืนยัน
             </button>
-          </div>
-
+          </div>   
         </div>
       </div>
+     
+
     </div>
   );
 }

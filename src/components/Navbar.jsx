@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
+
 export default function Navbar() {
   const [showFilter, setShowFilter] = useState(false);
   const navigate = useNavigate();
@@ -92,12 +93,13 @@ export default function Navbar() {
             👤
           </div>
 
-          <div className="text-2xl cursor-pointer hover:scale-105 transition">
-            🛒
-          </div>
+          <button onClick={() => navigate("/cart")}>
+      🛒
+    </button>
         </div>
 
       </div>
     </nav>
+    
   );
 }

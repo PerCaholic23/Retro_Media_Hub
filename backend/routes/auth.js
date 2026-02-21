@@ -139,8 +139,24 @@ router.get("/profile", verifyToken, (req, res) => {
   });
 });
 
-router.get("/profile/:id", (req, res) => {
-  const { id } = req.params;
+router.put("/me/address", verifyToken, (req, res) => {
+  const userId = req.user.id;
+  const { house, road, subdistrict, district, province, postalCode } = req.body;
+
+  db.query(
+    `UPDATE users 
+     SET house=?, road=?, subdistrict=?, district=?, province=?, postalCode=?
+     WHERE id=?`,
+    [house, road, subdistrict, district, province, postalCode, userId],
+    (err) => {
+      if (err) return res.status(500).json(err);
+      res.json({ message: "อัปเดตที่อยู่สำเร็จ" });
+    }
+  );
+});
+
+router.get("/me", verifyToken, (req, res) => {
+  const userId = req.user.id;
 
   db.query(
     `SELECT 
@@ -157,7 +173,7 @@ router.get("/profile/:id", (req, res) => {
       postalCode
      FROM users 
      WHERE id = ?`,
-    [id],
+    [userId],
     (err, result) => {
       if (err) return res.status(500).json(err);
       res.json(result[0]);
