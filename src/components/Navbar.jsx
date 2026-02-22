@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-
 export default function Navbar() {
   const [showFilter, setShowFilter] = useState(false);
   const navigate = useNavigate();
@@ -9,19 +8,25 @@ export default function Navbar() {
 
   const searchParams = new URLSearchParams(location.search);
   const search = searchParams.get("search") || "";
-
+  
+  // 🔥 ใช้ slug ให้ตรงกับระบบ category
   const categories = [
-    "CD เพลง",
-    "แผ่นเสียง",
-    "เทปคาสเซ็ท",
-    "โปสเตอร์ศิลปิน",
-    "เสื้อวง",
+    { name: "CD เพลง", slug: "cd" },
+    { name: "แผ่นเสียง", slug: "vinyl" },
+    { name: "เทปคาสเซ็ท", slug: "cassette" },
+    { name: "โปสเตอร์ศิลปิน", slug: "poster" },
+    { name: "เสื้อวง", slug: "tshirt" },
   ];
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
     navigate(`/home?search=${value}`);
   };
+
+ const handleCategoryClick = (slug) => {
+  navigate(`/home?category=${slug}`);
+  setShowFilter(false);
+};
 
   return (
     <nav className="bg-[#e9eff3] px-20 py-6">
@@ -47,7 +52,7 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* สินค้า */}
+        {/* สินค้า Dropdown */}
         <div className="text-center relative">
           <button
             onClick={() => setShowFilter(!showFilter)}
@@ -58,12 +63,13 @@ export default function Navbar() {
 
           {showFilter && (
             <div className="absolute top-10 left-1/2 -translate-x-1/2 bg-white shadow-lg rounded-2xl w-56 py-4 z-50">
-              {categories.map((item, index) => (
+              {categories.map((item) => (
                 <div
-                  key={index}
+                  key={item.slug}
+                  onClick={() => handleCategoryClick(item.slug)}
                   className="px-6 py-2 hover:bg-[#f3f6f9] cursor-pointer"
                 >
-                  {item}
+                  {item.name}
                 </div>
               ))}
             </div>
@@ -94,12 +100,11 @@ export default function Navbar() {
           </div>
 
           <button onClick={() => navigate("/cart")}>
-      🛒
-    </button>
+            🛒
+          </button>
         </div>
 
       </div>
     </nav>
-    
   );
 }

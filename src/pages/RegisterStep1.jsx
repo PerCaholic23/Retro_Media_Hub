@@ -111,7 +111,7 @@ function RegisterStep1() {
         <p className="text-center text-sm text-gray-700 mt-6">
           มีบัญชีอยู่แล้ว?{" "}
           <span
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/")}
             className="font-medium cursor-pointer underline"
           >
             เข้าสู่ระบบ

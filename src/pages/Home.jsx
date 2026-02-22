@@ -5,7 +5,8 @@ export default function Home() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const searchQuery = queryParams.get("search") || "";
+const searchQuery = queryParams.get("search") || "";
+const categoryQuery = queryParams.get("category") || "";
 
   const products = [
     { id: 1, name: "CD เพลง Rock มือสอง", price: 450 },
@@ -15,18 +16,24 @@ export default function Home() {
     { id: 5, name: "เทปคาสเซ็ท Classic", price: 250 },
   ];
 
-  const filteredProducts = searchQuery
-    ? products.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : products;
+  const filteredProducts = products.filter((product) => {
+  const matchSearch = searchQuery
+    ? product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    : true;
+
+  const matchCategory = categoryQuery
+    ? product.name.toLowerCase().includes(categoryQuery.toLowerCase())
+    : true;
+
+  return matchSearch && matchCategory;
+});
 
   return (
     <div className="bg-[#e9eff3] font-prompt">
       
 
       {/* 🏠 HERO SECTION (จะแสดงเฉพาะตอนยังไม่ search) */}
-      {!searchQuery && (
+      {!searchQuery && !categoryQuery && (
         <div className="flex justify-between px-24 py-10 relative">
           {/* LEFT */}
           <div className="w-1/2 mt-16">
@@ -40,9 +47,12 @@ export default function Home() {
               มือสอง
             </h1>
 
-            <button className="mt-8 bg-[#f28c45] text-white px-8 py-3 rounded-2xl shadow-lg hover:scale-105 transition">
-              🏪 ร้านค้าของคุณ
-            </button>
+            <button
+  onClick={() => navigate("/store")}
+  className="mt-8 bg-[#f28c45] text-white px-8 py-3 rounded-2xl shadow-lg hover:scale-105 transition"
+>
+  🏪 ร้านค้าของคุณ
+</button>
 
             {/* รายการสินค้าแนะนำ */}
             <div className="mt-10 bg-[#d6dee4] p-6 rounded-3xl w-[420px] shadow-md">
@@ -90,13 +100,26 @@ export default function Home() {
      {/* 🔎 PRODUCT SECTION */}
 <div className="px-24 pb-16">
 
-  {searchQuery && (
+  {(searchQuery || categoryQuery) && (
     <>
       <h2 className="text-2xl mb-6">
-        ผลการค้นหา:
-        <span className="text-[#f28c45] font-semibold ml-2">
-          {searchQuery}
-        </span>
+        {searchQuery && (
+          <>
+            ผลการค้นหา:
+            <span className="text-[#f28c45] font-semibold ml-2">
+              {searchQuery}
+            </span>
+          </>
+        )}
+
+        {!searchQuery && categoryQuery && (
+          <>
+            หมวดหมู่:
+            <span className="text-[#f28c45] font-semibold ml-2">
+              {categoryQuery}
+            </span>
+          </>
+        )}
       </h2>
 
       <div className="grid grid-cols-3 gap-8">

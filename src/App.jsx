@@ -10,6 +10,8 @@ import Layout from "./layout/Layout";
 import Cart from "./pages/Cart";
 import { CartProvider } from "./context/CartContext";
 import Checkout from "./pages/Checkout";
+import Store from "./pages/Store";
+import CategoryPage from "./pages/CategoryPage";
 
 function App() {
   return (
@@ -37,6 +39,8 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/store" element={<Store />} />
+          <Route path="/category/:slug" element={<CategoryPage />} />
           <Route
   path="/checkout"
   element={

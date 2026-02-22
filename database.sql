@@ -1,5 +1,5 @@
 -- สร้าง database ถ้ายังไม่มี
-CREATE DATABASE IF NOT EXISTS orangeapp;
+1.CREATE DATABASE IF NOT EXISTS orangeapp;
 
 -- เลือก database
 USE orangeapp;
@@ -23,4 +23,14 @@ CREATE TABLE users (
   province VARCHAR(100),
   postalCode VARCHAR(10),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+2.CREATE TABLE products (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255),
+  price DECIMAL(10,2),
+  image VARCHAR(255),
+  stock INT,
+  category_slug VARCHAR(100)
 );

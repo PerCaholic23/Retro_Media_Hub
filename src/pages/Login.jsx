@@ -11,7 +11,8 @@ function Login() {
   const inputStyle =
     "w-full px-4 py-3 rounded-xl bg-[#f9f1ef] border border-[#faa268] focus:outline-none focus:ring-2 focus:ring-[#f99146]";
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+  e.preventDefault(); // ป้องกัน refresh หน้า
     if (!email || !password) {
       alert("กรุณากรอกข้อมูลให้ครบ");
       return;
@@ -33,7 +34,7 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(res.data.user));
       
 
-      alert(res.data.message);
+      //alert(res.data.message);
 
       navigate("/home");
 
@@ -57,7 +58,7 @@ function Login() {
           เข้าสู่ระบบ
         </h2>
 
-        <div className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-4">
           <input
             type="text"
             placeholder="อีเมล"
@@ -73,15 +74,15 @@ function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-        </div>
+        
 
-        <button
-          onClick={handleLogin}
+        <button type="submit"
           className="w-full mt-6 bg-[#f99146] text-white py-3 rounded-xl font-medium hover:bg-[#f47f2a] transition"
         >
           เข้าสู่ระบบ
         </button>
-
+        </form>
+        
         <div className="text-center text-sm text-gray-700 mt-6 space-y-2">
           <p>
             ยังไม่มีบัญชีใช่ไหม?{" "}
