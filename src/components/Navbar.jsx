@@ -29,7 +29,7 @@ export default function Navbar() {
 };
 
   return (
-    <nav className="bg-[#e9eff3] px-20 py-6">
+    <nav className="sticky top-0 bg-[#e9eff3] px-20 py-4 z-50 shadow">
       <div className="grid grid-cols-5 items-center">
 
         {/* LOGO */}

@@ -53,7 +53,7 @@ function RegisterStep2() {
       await axios.post("http://localhost:5000/api/register", allData);
 
       alert("สมัครสมาชิกสำเร็จ 🎉");
-      navigate("/login");
+      navigate("/");
     } catch (err) {
       alert("สมัครไม่สำเร็จ");
     }
