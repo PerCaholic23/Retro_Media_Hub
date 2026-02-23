@@ -27,9 +27,8 @@ npm start
 
 # การทำงานในแต่ละขั้นตอน
 1) โคลน project มาลงที่เครื่องตัวเอง
-2) ติดตั้ง dependency ที่จำเป็น
-    2.1) npm install เพื่อติดตั้งโดยจะเป็นการดึงไฟล์มาจาก package.json (dependency ที่จำเป็นทั้งหมด)
-3) 
+2) ติดตั้ง dependency ที่จำเป็น npm install เพื่อติดตั้งโดยจะเป็นการดึงไฟล์มาจาก package.json (dependency ที่จำเป็นทั้งหมด) \n
+3) รันคำสั่ง npm start และ node server.js ใน terminal &nbsp
 
 # ข้อควรรู้
 Backend และ Frontend รันแยกกัน โดย npm start จะเป็นการรัน Frontend ส่วน node server.js จะเป็นการรัน Backend
