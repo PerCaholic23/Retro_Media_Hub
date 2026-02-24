@@ -105,6 +105,18 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+app.get("/api/category", (req, res) => {
+  res.json([
+    { category_slug: "cd", totalStock: 15 },
+    { category_slug: "vinyl", totalStock: 8 },
+    { category_slug: "cassette", totalStock: 5 },
+    { category_slug: "poster", totalStock: 12 },
+    { category_slug: "tshirt", totalStock: 20 }
+  ]);
+});
+
+
+
 // app.listen...
 app.listen(5000, () => {
   console.log("Server running on port 5000");
