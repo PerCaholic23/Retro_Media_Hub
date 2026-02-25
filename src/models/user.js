@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   district: { type: String, required: true },
   postalCode: { type: String, required: true },
 
+  promptpayQR: { type: String, default: "" },
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);

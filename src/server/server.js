@@ -12,8 +12,11 @@ require("dotenv").config();
 
 const app = express();
 
+// ในไฟล์ server.js หาบรรทัด app.use(express.json()) แล้วแก้เป็น:
+app.use(express.json({ limit: '50mb' })); 
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
-app.use(express.json());
+
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
@@ -108,6 +111,31 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+// ดึงข้อมูลโปรไฟล์
+app.get("/api/profile/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password");
+    if (!user) return res.status(404).json({ message: "ไม่พบผู้ใช้" });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// อัปเดตข้อมูลโปรไฟล์ (รวมรูปภาพ QR)
+app.put("/api/profile/:id", async (req, res) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    ).select("-password");
+    res.json({ message: "อัปเดตข้อมูลสำเร็จ", user: updatedUser });
+  } catch (err) {
+    res.status(500).json({ message: "Update failed" });
+  }
+});
+
 app.get("/api/category", (req, res) => {
   res.json([
     { category_slug: "cd", totalStock: 15 },
@@ -117,6 +145,8 @@ app.get("/api/category", (req, res) => {
     { category_slug: "tshirt", totalStock: 20 }
   ]);
 });
+
+// เพิ่มเข้าไปในไฟล์ server ของคุณ
 
 //app.listen...
 app.listen(5000, () => {
