@@ -89,9 +89,9 @@ export default function Profile() {
           {/* RIGHT SIDE: ที่อยู่ */}
           <div className="space-y-6">
             <Input label="บ้านเลขที่" name="address" value={user.address} onChange={handleChange} />
-            <Input label="ถนน" name="street" value={user.street} onChange={handleChange} />
+            <Input label="ถนน / ตำบล" name="street" value={user.street} onChange={handleChange} />
             <Input label="จังหวัด" name="province" value={user.province} onChange={handleChange} />
-            <Input label="อำเภอ" name="district" value={user.district} onChange={handleChange} />
+            <Input label="อำเภอ / เขต" name="district" value={user.district} onChange={handleChange} />
             <Input label="รหัสไปรษณีย์" name="postalCode" value={user.postalCode} onChange={handleChange} />
           </div>
         </div>
