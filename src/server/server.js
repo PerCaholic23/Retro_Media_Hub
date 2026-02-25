@@ -1,3 +1,6 @@
+const dns = require("dns").promises;
+dns.setServers(["1.1.1.1", "1.0.0.1"]);
+
 const jwt = require("jsonwebtoken");
 const express = require("express");
 const mongoose = require("mongoose");
@@ -114,8 +117,6 @@ app.get("/api/category", (req, res) => {
     { category_slug: "tshirt", totalStock: 20 }
   ]);
 });
-
-
 
 // app.listen...
 app.listen(5000, () => {
