@@ -1,0 +1,12 @@
+const mongoose = require("mongoose");
+
+const productSchema = new mongoose.Schema({
+  name: String,
+  artist: String,
+  description: String,
+  category: String, // cd, vinyl, etc
+  price: Number,
+  image: String, // for now store image URL or base64
+}, { timestamps: true });
+
+module.exports = mongoose.model("Product", productSchema);

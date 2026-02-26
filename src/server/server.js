@@ -5,7 +5,11 @@ const jwt = require("jsonwebtoken");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+
+//Get database from models folder
 const User = require("../models/user");
+const Product = require("../models/product");
+
 const bcrypt = require("bcrypt");
 
 require("dotenv").config();
@@ -138,7 +142,7 @@ app.put("/api/profile/:id", async (req, res) => {
 
 app.get("/api/category", (req, res) => {
   res.json([
-    { category_slug: "cd", totalStock: 15 },
+    { category_slug: "cd", totalStock: 10 },
     { category_slug: "vinyl", totalStock: 8 },
     { category_slug: "cassette", totalStock: 5 },
     { category_slug: "poster", totalStock: 12 },
@@ -146,7 +150,35 @@ app.get("/api/category", (req, res) => {
   ]);
 });
 
-// เพิ่มเข้าไปในไฟล์ server ของคุณ
+app.get("/api/category/:slug", async (req, res) => {
+  try {
+    const products = await Product.find({ category: req.params.slug });
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/api/product", async (req, res) => {
+  try {
+    const { name, artist, description, category, price, image } = req.body;
+
+    const product = new Product({
+      name,
+      artist,
+      description,
+      category,
+      price,
+      image,
+    });
+
+    await product.save();
+
+    res.json({ message: "Product added", product });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 //app.listen...
 app.listen(5000, () => {

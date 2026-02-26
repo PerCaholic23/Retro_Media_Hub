@@ -15,7 +15,7 @@ export default function CategoryPage() {
     artist: "",
     description: "",
     category: slug,
-    images: [],
+    images: "",
     previews: [],
   });
 
@@ -65,7 +65,7 @@ export default function CategoryPage() {
       setSelectedItems([]);
       setSelectAll(false);
     } else {
-      setSelectedItems(products.map((item) => item.id));
+      setSelectedItems(products.map((item) => item._id));
       setSelectAll(true);
     }
   };
@@ -75,40 +75,49 @@ export default function CategoryPage() {
   // =========================
 
   const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
+  const file = e.target.files[0]; // just first image for now
+  if (!file) return;
 
-    const previews = files.map((file) =>
-      URL.createObjectURL(file)
-    );
+  const reader = new FileReader();
 
-    setFormData({
-      ...formData,
-      images: files,
-      previews: previews,
-    });
+  reader.onloadend = () => {
+    setFormData((prev) => ({
+      ...prev,
+      image: reader.result, // base64 string
+      previews: [reader.result], // use same for preview
+    }));
   };
 
+  reader.readAsDataURL(file);
+};
+
   // =========================
-  // ADD PRODUCT (mock)
+  // ADD PRODUCT
   // =========================
 
-  const handleAddProduct = () => {
-    if (!formData.name || !formData.artist || formData.previews.length === 0) {
-      alert("กรุณากรอกข้อมูลและใส่รูปอย่างน้อย 1 รูป");
-      return;
-    }
+  const handleAddProduct = async () => {
+  if (!formData.name || !formData.artist || formData.previews.length === 0) {
+    alert("Please fill in all fields and upload at least 1 image");
+    return;
+  }
 
-    const newProduct = {
-      id: Date.now(),
+  try {
+    const res = await axios.post("http://localhost:5000/api/product", {
       name: formData.name,
       artist: formData.artist,
+      description: formData.description,
+      category: formData.category,
       price: 0,
-      image: formData.previews[0],
-    };
+      image: formData.image,
+    });
 
-    setProducts([...products, newProduct]);
+    setProducts([...products, res.data.product]);
     setShowModal(false);
-  };
+
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   return (
     <div className="bg-[#e9eff3] font-prompt pb-32">
@@ -117,14 +126,14 @@ export default function CategoryPage() {
       <div className="px-20 pt-10 space-y-6">
         {products.map((item) => (
           <div
-            key={item.id}
+            key={item._id}
             className="bg-white rounded-2xl p-6 flex items-center justify-between shadow-sm"
           >
             <div className="flex items-center gap-6">
               <input
                 type="checkbox"
-                checked={selectedItems.includes(item.id)}
-                onChange={() => handleSelectItem(item.id)}
+                checked={selectedItems.includes(item._id)}
+                onChange={() => handleSelectItem(item._id)}
               />
 
               <img
