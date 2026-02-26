@@ -5,28 +5,28 @@ const jwt = require("jsonwebtoken");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const bcrypt = require("bcrypt");
+require("dotenv").config();
 
-//Get database from models folder
+// Models
 const User = require("../models/user");
 const Product = require("../models/product");
 
-const bcrypt = require("bcrypt");
-
-require("dotenv").config();
-
 const app = express();
 
-// ในไฟล์ server.js หาบรรทัด app.use(express.json()) แล้วแก้เป็น:
-app.use(express.json({ limit: '50mb' })); 
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
-
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.log(err));
 
-//Handle from register
+/* =================================================
+   AUTH SECTION
+================================================= */
+
+// Register
 app.post("/api/register", async (req, res) => {
   try {
     const {
@@ -63,59 +63,51 @@ app.post("/api/register", async (req, res) => {
     });
 
     await user.save();
-
     res.status(201).json({ message: "User created" });
 
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
+// Login
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 1. ตรวจสอบว่ามี Email นี้ในระบบไหม
     const user = await User.findOne({ email });
-    if (!user) {
+    if (!user)
       return res.status(400).json({ message: "ไม่พบอีเมลนี้ในระบบ" });
-    }
 
-    // 2. ตรวจสอบรหัสผ่าน (เทียบรหัสที่พิมพ์มา กับ รหัสที่ถูก Hash ใน DB)
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    if (!isMatch)
       return res.status(400).json({ message: "รหัสผ่านไม่ถูกต้อง" });
-    }
 
-    // 3. สร้าง Token (กุญแจยืนยันตัวตน)
-    // ใช้ JWT_SECRET จากไฟล์ .env (ถ้ายังไม่มีให้ไปตั้งใน .env เช่น JWT_SECRET=mysecret)
     const token = jwt.sign(
-      { id: user._id }, 
-      process.env.JWT_SECRET || "fallback_secret", 
+      { id: user._id },
+      process.env.JWT_SECRET || "fallback_secret",
       { expiresIn: "1d" }
     );
 
-    /* ===========================================
-       ✅ นี่คือส่วนที่ส่งกลับไปให้ React (ที่คุณถาม)
-       =========================================== */
     res.json({
       message: "เข้าสู่ระบบสำเร็จ",
-      token: token,
-      user: { 
-        id: user._id, 
+      token,
+      user: {
+        id: user._id,
         email: user.email,
-        username: user.username // คุณสามารถส่งชื่อไปโชว์ที่หน้าเว็บได้
+        username: user.username
       }
     });
 
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// ดึงข้อมูลโปรไฟล์
+/* =================================================
+   PROFILE
+================================================= */
+
 app.get("/api/profile/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
@@ -126,7 +118,6 @@ app.get("/api/profile/:id", async (req, res) => {
   }
 });
 
-// อัปเดตข้อมูลโปรไฟล์ (รวมรูปภาพ QR)
 app.put("/api/profile/:id", async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(
@@ -134,54 +125,101 @@ app.put("/api/profile/:id", async (req, res) => {
       { $set: req.body },
       { new: true }
     ).select("-password");
+
     res.json({ message: "อัปเดตข้อมูลสำเร็จ", user: updatedUser });
+
   } catch (err) {
     res.status(500).json({ message: "Update failed" });
   }
 });
 
-app.get("/api/category", (req, res) => {
-  res.json([
-    { category_slug: "cd", totalStock: 10 },
-    { category_slug: "vinyl", totalStock: 8 },
-    { category_slug: "cassette", totalStock: 5 },
-    { category_slug: "poster", totalStock: 12 },
-    { category_slug: "tshirt", totalStock: 20 }
-  ]);
+/* =================================================
+   PRODUCT SECTION
+================================================= */
+
+// ดึงจำนวน stock ตามหมวด (dynamic จาก DB)
+app.get("/api/category", async (req, res) => {
+  try {
+    const result = await Product.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          totalStock: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const formatted = result.map(item => ({
+      category_slug: item._id,
+      totalStock: item.totalStock
+    }));
+
+    res.json(formatted);
+
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
+// ดึงสินค้าตามหมวด
 app.get("/api/category/:slug", async (req, res) => {
   try {
-    const products = await Product.find({ category: req.params.slug });
+    const products = await Product.find({
+      category: req.params.slug
+    });
     res.json(products);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 });
 
+// เพิ่มสินค้า
 app.post("/api/product", async (req, res) => {
   try {
-    const { name, artist, description, category, price, image } = req.body;
-
-    const product = new Product({
-      name,
-      artist,
-      description,
-      category,
-      price,
-      image,
-    });
-
+    const product = new Product(req.body);
     await product.save();
-
     res.json({ message: "Product added", product });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 });
 
-//app.listen...
+// ลบสินค้า
+app.delete("/api/product/:id", async (req, res) => {
+  try {
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ message: "ลบสินค้าสำเร็จ" });
+  } catch (err) {
+    res.status(500).json({ message: "ลบไม่สำเร็จ" });
+  }
+});
+
+// แก้ไขสินค้า
+app.put("/api/product/:id", async (req, res) => {
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "ไม่พบสินค้า" });
+    }
+
+    res.json({
+      message: "แก้ไขสำเร็จ",
+      product: updatedProduct
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "แก้ไขไม่สำเร็จ" });
+  }
+});
+
+/* ================================================= */
+
 app.listen(5000, () => {
   console.log("Server running on port 5000");
 });
-// // module.exports = app;
