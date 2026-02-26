@@ -199,16 +199,29 @@ export default function Home() {
   const categoryQuery = queryParams.get("category") || "";
 
   // 🔐 1. ตรวจสอบการ Login เมื่อเปิดหน้าเว็บ
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   const savedUser = localStorage.getItem("user");
 
-    if (!token || !savedUser) {
-      navigate("/login"); 
-    } else {
-      setUser(JSON.parse(savedUser));
-    }
-  }, [navigate]);
+  //   if (!token || !savedUser) {
+  //     navigate("/login"); 
+  //   } else {
+  //     setUser(JSON.parse(savedUser));
+  //   }
+  // }, [navigate]);
+  // 🔐 1. ตรวจสอบการ Login เมื่อเปิดหน้าเว็บครั้งแรกเท่านั้น
+useEffect(() => {
+  const token = localStorage.getItem("token");
+  const savedUser = localStorage.getItem("user");
+
+  // 🚩 แก้ไข: ถ้าไม่มี Token จริงๆ ถึงจะเตะไปหน้า Login
+  if (!token) {
+    navigate("/login");
+  } else if (savedUser) {
+    // ถ้ามี Token และมีข้อมูล user ในเครื่อง ให้ดึงมาใส่ State เสมอ
+    setUser(JSON.parse(savedUser));
+  }
+}, []); // ใส่เป็น [] เพื่อให้เช็คแค่ครั้งเดียวตอนโหลดหน้าเว็บ
 
   // 🚪 2. ฟังก์ชันออกจากระบบ
   const handleLogout = () => {
@@ -236,7 +249,7 @@ export default function Home() {
   });
 
   // กัน Error ถ้า user ยังโหลดไม่เสร็จ
-  if (!user) return null;
+  if (!localStorage.getItem("token")) return null;
 
   return (
     <div className="bg-[#e9eff3] font-prompt min-h-screen">
@@ -295,7 +308,7 @@ export default function Home() {
           </div>
 
           {/* RIGHT */}
-          <div className="relative w-[650px] h-[650px]">
+          {/* <div className="relative w-[650px] h-[650px]">
             <div className="absolute top-[170px] left-[0px] w-[360px] h-[360px] rounded-full bg-gray-400 z-20 shadow-xl flex items-center justify-center text-white">
               IMAGE
               <span className="absolute bottom-6 bg-white px-5 py-2 rounded-xl shadow text-black">CD เพลง</span>
@@ -304,6 +317,40 @@ export default function Home() {
             <SmallCircle text="เทปคาสเซ็ท" className="top-[100px] left-[340px] z-10" />
             <SmallCircle text="โปสเตอร์ศิลปิน" className="bottom-[220px] left-[400px] z-10" />
             <SmallCircle text="เสื้อวง" className="bottom-[45px] left-[330px] z-10" />
+          </div> */}
+          {/* RIGHT */}
+          <div className="relative w-[650px] h-[650px]">
+            {/* วงกลมใหญ่ตรงกลาง (CD เพลง) */}
+              {/* วงกลมใหญ่ตรงกลาง (CD เพลง) */}
+                <div 
+                  onClick={() => navigate("/home?category=CD เพลง")} // เพิ่มบรรทัดนี้
+                  className="absolute top-[160px] left-[0px] w-[360px] h-[360px] rounded-full bg-white z-20 shadow-xl flex items-center justify-center overflow-hidden cursor-pointer hover:scale-105 transition border-4 border-white"
+                >
+                  <img src="https://i.pinimg.com/736x/25/67/32/256732cfc95f431a70ee49de12c328a1.jpg" className="w-full h-full object-cover" />
+                  <span className="absolute bottom-6 bg-white px-5 py-2 rounded-xl shadow text-black font-bold">CD เพลง</span>
+                </div>
+
+            {/* วงกลมเล็กๆ รอบๆ */}
+            <SmallCircle 
+              text="แผ่นเสียง" 
+              image="https://i.pinimg.com/736x/4b/c8/6d/4bc86d00722fd941baededbae9411845.jpg"
+              className="top-[-10px] left-[200px] z-10" 
+            />
+            <SmallCircle 
+              text="เทปคาสเซ็ท" 
+              image="https://i.pinimg.com/1200x/00/00/99/000099d11fdec13320997e182e968f5f.jpg"
+              className="top-[100px] left-[340px] z-10" 
+            />
+            <SmallCircle 
+              text="โปสเตอร์ศิลปิน" 
+              image="https://i.pinimg.com/736x/6e/0a/2b/6e0a2b2826c82a28084348e7a0004bbb.jpg"
+              className="bottom-[220px] left-[390px] z-10" 
+            />
+            <SmallCircle 
+              text="เสื้อวง" 
+              image="https://i.pinimg.com/736x/01/03/4d/01034d08a5985dd64c0af29afda50ca6.jpg"
+              className="bottom-[45px] left-[330px] z-10" 
+            />
           </div>
         </div>
       )}
@@ -345,11 +392,28 @@ export default function Home() {
   );
 }
 
-function SmallCircle({ text, className }) {
+function SmallCircle({ text, className, image }) {
+  const navigate = useNavigate(); // ใช้สำหรับเปลี่ยน URL
+
   return (
-    <div className={`absolute w-[150px] h-[150px] rounded-full bg-gray-400 shadow-md flex items-center justify-center text-white ${className}`}>
-      IMAGE
-      <span className="absolute -bottom-4 bg-white px-4 py-1 rounded-xl shadow text-sm text-black whitespace-nowrap">{text}</span>
+    <div 
+      // พอกดแล้วจะเปลี่ยน URL เป็น /?category=ชื่อหมวดหมู่
+      onClick={() => navigate(`/home?category=${text}`)} 
+      className={`absolute flex flex-col items-center cursor-pointer hover:scale-110 transition active:scale-95 ${className}`}
+    >
+      {/* ส่วนวงกลมรูปภาพ */}
+      <div className="w-[150px] h-[150px] rounded-full bg-white shadow-md flex items-center justify-center overflow-hidden border-2 border-gray-100 relative">
+        {image ? (
+          <img src={image} alt={text} className="w-full h-full object-cover" />
+        ) : (
+          <span className="text-gray-400 text-xs">No Image</span>
+        )}
+      </div>
+
+      {/* ส่วนป้ายชื่อ */}
+      <span className="mt-[-20px] z-30 bg-white px-4 py-1 rounded-xl shadow-md text-sm text-black whitespace-nowrap border border-gray-100 font-medium">
+        {text}
+      </span>
     </div>
   );
 }
