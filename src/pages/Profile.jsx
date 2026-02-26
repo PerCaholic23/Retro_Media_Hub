@@ -62,7 +62,7 @@ export default function Profile() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* LEFT SIDE: ข้อมูลส่วนตัว */}
           <div className="space-y-6">
-            <Input label="ชื่อผู้ใช้" name="username" value={user.username} onChange={handleChange} />
+            <Input label="ชื่อผู้ใช้" name="username" value={user.username} onChange={handleChange} readOnly={true} />
             <Input label="ชื่อ-นามสกุล" name="fullName" value={user.fullName} onChange={handleChange} />
             <Input label="อีเมล" name="email" value={user.email} onChange={handleChange} />
             <Input label="เบอร์มือถือ" name="phone" value={user.phone} onChange={handleChange} />
@@ -106,7 +106,8 @@ export default function Profile() {
   );
 }
 
-function Input({ label, name, value, onChange }) {
+// แก้ไขฟังก์ชัน Input ด้านล่างสุดของไฟล์ Profile.jsx
+function Input({ label, name, value, onChange, readOnly = false }) { // ✅ กำหนดค่าเริ่มต้นเป็น false
   return (
     <div>
       <label className="block text-gray-600 mb-1">{label}</label>
@@ -114,7 +115,12 @@ function Input({ label, name, value, onChange }) {
         name={name}
         value={value || ""}
         onChange={onChange}
-        className="w-full bg-white rounded-xl px-4 py-3 border border-gray-300 focus:border-orange-400 outline-none transition"
+        readOnly={readOnly} // ✅ ใช้ค่า readOnly ที่ส่งมาจากตัวแม่
+        className={`w-full rounded-xl px-4 py-3 border border-gray-300 outline-none transition ${
+          readOnly 
+            ? "bg-gray-100 cursor-not-allowed text-gray-500 shadow-inner" // สไตล์สำหรับตัวที่โดนล็อค
+            : "bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100" // สไตล์สำหรับตัวที่แก้ได้
+        }`}
       />
     </div>
   );
