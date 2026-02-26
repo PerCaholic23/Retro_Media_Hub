@@ -8,7 +8,7 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 
-// Models
+// Models test
 const User = require("../models/user");
 const Product = require("../models/product");
 
