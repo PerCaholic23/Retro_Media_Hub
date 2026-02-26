@@ -5,8 +5,6 @@ import axios from "axios";
 function RegisterStep2() {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // ข้อมูลจาก step1
   const step1Data = location.state;
 
   const [formData, setFormData] = useState({
@@ -18,8 +16,21 @@ function RegisterStep2() {
     postalCode: "",
   });
 
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "error",
+  });
+
   const inputStyle =
     "w-full px-4 py-3 rounded-xl bg-[#f9f1ef] border border-[#faa268] focus:outline-none focus:ring-2 focus:ring-[#f99146]";
+
+  const showToast = (message, type = "error") => {
+    setToast({ show: true, message, type });
+    setTimeout(() => {
+      setToast({ show: false, message: "", type: "error" });
+    }, 2500);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,80 +50,44 @@ function RegisterStep2() {
 
   const handleSubmit = async () => {
     if (!step1Data) {
-      alert("ข้อมูลหาย กรุณากรอกใหม่");
-      navigate("/register/step1");
+      showToast("ข้อมูลหาย กรุณากรอกใหม่");
+      setTimeout(() => navigate("/register/step1"), 1200);
       return;
     }
 
-    const allData = {
-      ...step1Data,
-      ...formData,
-    };
+    const allData = { ...step1Data, ...formData };
 
     try {
       await axios.post("http://localhost:5000/api/register", allData);
 
-      alert("สมัครสมาชิกสำเร็จ 🎉");
-      navigate("/");
+      showToast("สมัครสมาชิกสำเร็จ 🎉", "success");
+
+      setTimeout(() => {
+        navigate("/");
+      }, 1200);
     } catch (err) {
-      alert("สมัครไม่สำเร็จ");
+      showToast("สมัครไม่สำเร็จ");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#de490a]">
+    <div className="min-h-screen flex items-center justify-center bg-[#de490a] relative">
       <div className="w-full max-w-lg bg-[#f6d5cd] rounded-3xl shadow-xl p-8">
         <h2 className="text-2xl font-bold text-center mb-6">
           ข้อมูลที่อยู่
         </h2>
 
         <div className="space-y-4">
-          <input
-            type="text"
-            name="fullName"
-            placeholder="ชื่อ-นามสกุล"
-            className={inputStyle}
-            onChange={handleChange}
-          />
-
-          <input
-            type="text"
-            name="address"
-            placeholder="บ้านเลขที่ / อาคาร / หมู่บ้าน"
-            className={inputStyle}
-            onChange={handleChange}
-          />
-
-          <input
-            type="text"
-            name="street"
-            placeholder="ถนน / ตำบล"
-            className={inputStyle}
-            onChange={handleChange}
-          />
-
-          <input
-            type="text"
-            name="province"
-            placeholder="จังหวัด"
-            className={inputStyle}
-            onChange={handleChange}
-          />
+          <input name="fullName" placeholder="ชื่อ-นามสกุล" onChange={handleChange} className={inputStyle} />
+          <input name="address" placeholder="บ้านเลขที่ / อาคาร" onChange={handleChange} className={inputStyle} />
+          <input name="street" placeholder="ถนน / ตำบล" onChange={handleChange} className={inputStyle} />
+          <input name="province" placeholder="จังหวัด" onChange={handleChange} className={inputStyle} />
 
           <div className="grid grid-cols-2 gap-4">
+            <input name="district" placeholder="อำเภอ / เขต" onChange={handleChange} className={inputStyle} />
             <input
-              type="text"
-              name="district"
-              placeholder="อำเภอ / เขต"
-              className={inputStyle}
-              onChange={handleChange}
-            />
-
-            <input
-              type="text"
               name="postalCode"
               placeholder="รหัสไปรษณีย์"
-              inputMode="numeric"
               maxLength={5}
               value={formData.postalCode}
               onChange={handleChange}
@@ -129,12 +104,25 @@ function RegisterStep2() {
         </button>
 
         <button
-          onClick={() => navigate("/register/step1")}
+          onClick={() =>
+            navigate("/register/step1", {
+              state: step1Data,
+            })
+          }
           className="w-full mt-3 text-sm text-gray-800 underline"
         >
           ← ย้อนกลับ
         </button>
       </div>
+
+      {toast.show && (
+        <div
+          className={`fixed bottom-6 right-6 px-6 py-3 rounded-xl shadow-lg text-white
+          ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}
+        >
+          {toast.message}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,19 +1,36 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 
 function RegisterStep1() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
+    username: location.state?.username || "",
+    email: location.state?.email || "",
+    phone: location.state?.phone || "",
+    password: location.state?.password || "",
+    confirmPassword: location.state?.confirmPassword || "",
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "error",
   });
 
   const inputStyle =
-    "w-full px-4 py-3 rounded-xl bg-[#f9f1ef] border border-[#faa268] focus:outline-none focus:ring-2 focus:ring-[#f99146]";
+    "w-full px-4 py-3 pr-12 rounded-xl bg-[#f9f1ef] border border-[#faa268] focus:outline-none focus:ring-2 focus:ring-[#f99146]";
+
+  const showToast = (message, type = "error") => {
+    setToast({ show: true, message, type });
+    setTimeout(() => {
+      setToast({ show: false, message: "", type: "error" });
+    }, 2500);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,12 +52,17 @@ function RegisterStep1() {
     const { username, email, phone, password, confirmPassword } = formData;
 
     if (!username || !email || !phone || !password || !confirmPassword) {
-      alert("กรอกข้อมูลให้ครบก่อนนะ");
+      showToast("กรอกข้อมูลให้ครบก่อนนะ");
+      return;
+    }
+
+    if (password.length < 6) {
+      showToast("รหัสผ่านต้องอย่างน้อย 6 ตัวอักษร");
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("รหัสผ่านไม่ตรงกัน");
+      showToast("รหัสผ่านไม่ตรงกัน");
       return;
     }
 
@@ -50,7 +72,7 @@ function RegisterStep1() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#de490a]">
+    <div className="min-h-screen flex items-center justify-center bg-[#de490a] relative">
       <div className="w-full max-w-md bg-[#f6d5cd] rounded-3xl shadow-xl p-8">
         <h2 className="text-2xl font-bold text-center mb-6">
           สมัครสมาชิก
@@ -61,44 +83,66 @@ function RegisterStep1() {
             type="text"
             name="username"
             placeholder="ชื่อผู้ใช้"
-            className={inputStyle}
+            value={formData.username}
             onChange={handleChange}
+            className={inputStyle.replace("pr-12", "")}
           />
 
           <input
             type="email"
             name="email"
             placeholder="อีเมล"
-            className={inputStyle}
+            value={formData.email}
             onChange={handleChange}
+            className={inputStyle.replace("pr-12", "")}
           />
 
           <input
             type="text"
             name="phone"
             placeholder="เบอร์โทรศัพท์"
-            inputMode="numeric"
-            pattern="[0-9]*"
             value={formData.phone}
             onChange={handleChange}
-            className={inputStyle}
+            className={inputStyle.replace("pr-12", "")}
           />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="รหัสผ่าน"
-            className={inputStyle}
-            onChange={handleChange}
-          />
+          {/* Password */}
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="รหัสผ่าน"
+              value={formData.password}
+              onChange={handleChange}
+              className={inputStyle}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#f99146] text-lg"
+            >
+              {showPassword ? "🙈" : "👁"}
+            </button>
+          </div>
 
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="ยืนยันรหัสผ่าน"
-            className={inputStyle}
-            onChange={handleChange}
-          />
+          {/* Confirm Password */}
+          <div className="relative">
+            <input
+              type={showConfirm ? "text" : "password"}
+              name="confirmPassword"
+              placeholder="ยืนยันรหัสผ่าน"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className={inputStyle}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirm(!showConfirm)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#f99146] text-lg"
+            >
+              {showConfirm ? "🙈" : "👁"}
+            </button>
+          </div>
         </div>
 
         <button
@@ -118,6 +162,15 @@ function RegisterStep1() {
           </span>
         </p>
       </div>
+
+      {toast.show && (
+        <div
+          className={`fixed bottom-6 right-6 px-6 py-3 rounded-xl shadow-lg text-white
+          ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}
+        >
+          {toast.message}
+        </div>
+      )}
     </div>
   );
 }
