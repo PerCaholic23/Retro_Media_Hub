@@ -7,14 +7,15 @@ export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // รองรับกรณีกดสั่งจากหน้า Product โดยตรง
   const directProduct = location.state?.product || null;
 
   const [address, setAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("qr");
   const [loading, setLoading] = useState(true);
 
-  // ถ้ามี directProduct ให้ใช้ตัวนั้น ไม่งั้นใช้สินค้าที่เลือกจาก cart
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
   const itemsToCheckout = directProduct
     ? [directProduct]
     : cartItems.filter((item) => item.checked);
@@ -27,9 +28,7 @@ export default function Checkout() {
   const shippingFee = subtotal > 0 ? 39 : 0;
   const total = subtotal + shippingFee;
 
-  /* ===========================
-     FETCH USER ADDRESS
-  =========================== */
+  /* ================= FETCH USER ================= */
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -53,9 +52,7 @@ export default function Checkout() {
     fetchUser();
   }, []);
 
-  /* ===========================
-     HANDLE ORDER
-  =========================== */
+  /* ================= HANDLE ORDER ================= */
   const handleOrder = async () => {
     if (itemsToCheckout.length === 0) {
       alert("ไม่มีสินค้าในรายการ");
@@ -79,14 +76,16 @@ export default function Checkout() {
         }),
       });
 
-      const data = await res.json();
-
       if (res.ok) {
-        alert("สั่งซื้อสำเร็จ 🎉");
         clearCart();
-        navigate("/home");
+
+        if (paymentMethod === "qr") {
+          setShowQRModal(true);
+        } else {
+          setShowSuccessModal(true);
+        }
       } else {
-        alert(data.message || "เกิดข้อผิดพลาด");
+        alert("เกิดข้อผิดพลาด");
       }
     } catch (error) {
       console.error(error);
@@ -94,31 +93,23 @@ export default function Checkout() {
     }
   };
 
-  /* ===========================
-     RENDER
-  =========================== */
   return (
-    <div className="px-24 py-10 space-y-8">
-      {/* =======================
-         รายการสินค้า
-      ======================= */}
+    <div className="px-24 py-10 pb-40 space-y-8">
+
+      {/* ================= รายการสินค้า ================= */}
       <div className="bg-white rounded-3xl p-6 shadow-md space-y-6">
         {itemsToCheckout.map((item) => (
-          <div
-            key={item.id}
-            className="flex items-center justify-between border-b pb-4"
-          >
+          <div key={item.id}
+            className="flex items-center justify-between border-b pb-4">
             <div className="flex items-center gap-6">
               <div className="w-20 h-20 bg-gray-300 rounded-xl flex items-center justify-center text-white">
                 IMG
               </div>
-
               <div>
                 <h3 className="font-medium">{item.name}</h3>
                 <p className="text-gray-500 text-sm">{item.artist}</p>
               </div>
             </div>
-
             <p className="font-semibold">
               ฿{item.price * (item.quantity || 1)}
             </p>
@@ -126,9 +117,7 @@ export default function Checkout() {
         ))}
       </div>
 
-      {/* =======================
-         ที่อยู่จัดส่ง
-      ======================= */}
+      {/* ================= ที่อยู่ ================= */}
       <div className="bg-white rounded-3xl p-6 shadow-md">
         <h2 className="font-semibold mb-4 text-lg text-orange-500">
           📍 ที่อยู่ในการจัดส่ง
@@ -151,9 +140,7 @@ export default function Checkout() {
         )}
       </div>
 
-      {/* =======================
-         วิธีการชำระเงิน
-      ======================= */}
+      {/* ================= วิธีชำระเงิน ================= */}
       <div className="bg-white rounded-3xl p-6 shadow-md">
         <h2 className="font-semibold mb-4 text-lg">
           วิธีการชำระเงิน
@@ -184,25 +171,79 @@ export default function Checkout() {
         </div>
       </div>
 
-      {/* =======================
-         สรุปราคา
-      ======================= */}
-      <div className="bg-white rounded-3xl p-6 shadow-md flex justify-between items-end">
-        <div className="space-y-2 text-gray-600">
-          <p>รวมการสั่งซื้อ: ฿{subtotal}</p>
-          <p>การจัดส่ง: ฿{shippingFee}</p>
+      {/* ================= Sticky Bottom ================= */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg px-24 py-5 flex justify-between items-center">
+        <div className="space-y-1 text-gray-600">
+          <p>รวมสินค้า: ฿{subtotal}</p>
+          <p>ค่าจัดส่ง: ฿{shippingFee}</p>
           <p className="text-lg font-bold text-orange-500">
-            ยอดชำระทั้งหมด: ฿{total}
+            ยอดรวม: ฿{total}
           </p>
         </div>
 
         <button
           onClick={handleOrder}
-          className="bg-[#f28c45] text-white px-10 py-4 rounded-2xl shadow hover:scale-105 transition"
+          className="bg-[#f28c45] text-white px-10 py-4 rounded-2xl hover:scale-105 transition"
         >
           สั่งสินค้า
         </button>
       </div>
+
+      {/* ================= QR MODAL ================= */}
+      {showQRModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white w-[400px] p-8 rounded-2xl relative text-center">
+            <button
+              onClick={() => {
+                setShowQRModal(false);
+                navigate("/home");
+              }}
+              className="absolute top-3 right-4 text-gray-400 text-xl"
+            >
+              ✕
+            </button>
+
+            <h2 className="text-xl font-semibold mb-6">
+              กรุณาชำระเงินผ่าน QR
+            </h2>
+
+            {/* อนาคตเปลี่ยนเป็น QR ร้าน */}
+            <div className="w-60 h-60 bg-gray-300 mx-auto rounded-xl flex items-center justify-center">
+              QR IMAGE
+            </div>
+
+            <p className="mt-4 text-gray-500">
+              สแกนเพื่อชำระเงิน ฿{total}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ================= SUCCESS MODAL ================= */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white w-[400px] p-8 rounded-2xl relative text-center">
+            <button
+              onClick={() => {
+                setShowSuccessModal(false);
+                navigate("/home");
+              }}
+              className="absolute top-3 right-4 text-gray-400 text-xl"
+            >
+              ✕
+            </button>
+
+            <h2 className="text-2xl font-semibold text-green-500 mb-4">
+              🎉 สั่งซื้อสำเร็จ
+            </h2>
+
+            <p className="text-gray-600">
+              ขอบคุณสำหรับการสั่งซื้อ
+            </p>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

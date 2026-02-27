@@ -8,8 +8,7 @@ export default function Navbar() {
 
   const searchParams = new URLSearchParams(location.search);
   const search = searchParams.get("search") || "";
-  
-  // 🔥 ใช้ slug ให้ตรงกับระบบ category
+
   const categories = [
     { name: "CD เพลง", slug: "cd" },
     { name: "แผ่นเสียง", slug: "vinyl" },
@@ -23,10 +22,10 @@ export default function Navbar() {
     navigate(`/home?search=${value}`);
   };
 
- const handleCategoryClick = (slug) => {
-  navigate(`/home?category=${slug}`);
-  setShowFilter(false);
-};
+  const handleCategoryClick = (slug) => {
+    navigate(`/home?category=${slug}`);
+    setShowFilter(false);
+  };
 
   return (
     <nav className="sticky top-0 bg-[#e9eff3] px-20 py-4 z-50 shadow">
@@ -86,24 +85,64 @@ export default function Navbar() {
               onChange={handleSearchChange}
               className="outline-none px-2 w-full"
             />
-            🔍
+
+            {/* 🔍 Search Icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 text-black hover:text-gray-600 transition"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
           </div>
         </div>
 
         {/* Profile + Cart */}
         <div className="flex justify-end items-center gap-6">
+
+          {/* Profile */}
           <div
             onClick={() => navigate("/profile")}
-            className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center cursor-pointer hover:scale-105 transition"
+            className="w-10 h-10 rounded-full border-2 border-black flex items-center justify-center cursor-pointer hover:bg-black hover:text-white transition"
           >
-            👤
+            {/* 👤 Profile Icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <circle cx="12" cy="7" r="4" />
+              <path d="M5.5 21a6.5 6.5 0 0113 0" />
+            </svg>
           </div>
 
-          <button onClick={() => navigate("/cart")}>
-            🛒
+          {/* 🛒 Cart */}
+          <button
+            onClick={() => navigate("/cart")}
+            className="hover:scale-110 transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-6 h-6 text-black hover:text-gray-600 transition"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h7.72a2 2 0 002-1.61L23 6H6" />
+            </svg>
           </button>
-        </div>
 
+        </div>
       </div>
     </nav>
   );

@@ -16,7 +16,7 @@ function RegisterStep1() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const [toast, setToast] = useState({
+  const [modal, setModal] = useState({
     show: false,
     message: "",
     type: "error",
@@ -25,11 +25,8 @@ function RegisterStep1() {
   const inputStyle =
     "w-full px-4 py-3 pr-12 rounded-xl bg-[#f9f1ef] border border-[#faa268] focus:outline-none focus:ring-2 focus:ring-[#f99146]";
 
-  const showToast = (message, type = "error") => {
-    setToast({ show: true, message, type });
-    setTimeout(() => {
-      setToast({ show: false, message: "", type: "error" });
-    }, 2500);
+  const showModal = (message, type = "error") => {
+    setModal({ show: true, message, type });
   };
 
   const handleChange = (e) => {
@@ -52,17 +49,17 @@ function RegisterStep1() {
     const { username, email, phone, password, confirmPassword } = formData;
 
     if (!username || !email || !phone || !password || !confirmPassword) {
-      showToast("กรอกข้อมูลให้ครบก่อนนะ");
+      showModal("กรอกข้อมูลให้ครบก่อนนะ");
       return;
     }
 
     if (password.length < 6) {
-      showToast("รหัสผ่านต้องอย่างน้อย 6 ตัวอักษร");
+      showModal("รหัสผ่านต้องอย่างน้อย 6 ตัวอักษร");
       return;
     }
 
     if (password !== confirmPassword) {
-      showToast("รหัสผ่านไม่ตรงกัน");
+      showModal("รหัสผ่านไม่ตรงกัน");
       return;
     }
 
@@ -119,9 +116,9 @@ function RegisterStep1() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#f99146] text-lg"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#f99146] text-sm"
             >
-              {showPassword ? "🙈" : "👁"}
+              {showPassword ? "ซ่อน" : "แสดง"}
             </button>
           </div>
 
@@ -138,9 +135,9 @@ function RegisterStep1() {
             <button
               type="button"
               onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#f99146] text-lg"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#f99146] text-sm"
             >
-              {showConfirm ? "🙈" : "👁"}
+              {showConfirm ? "ซ่อน" : "แสดง"}
             </button>
           </div>
         </div>
@@ -163,12 +160,26 @@ function RegisterStep1() {
         </p>
       </div>
 
-      {toast.show && (
-        <div
-          className={`fixed bottom-6 right-6 px-6 py-3 rounded-xl shadow-lg text-white
-          ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}
-        >
-          {toast.message}
+      {/* MODAL */}
+      {modal.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white w-[360px] p-8 rounded-2xl relative text-center">
+
+            <button
+              onClick={() => setModal({ ...modal, show: false })}
+              className="absolute top-3 right-4 text-gray-400 text-xl"
+            >
+              ×
+            </button>
+
+            <h2 className="text-xl font-semibold text-red-500 mb-4">
+              เกิดข้อผิดพลาด
+            </h2>
+
+            <p className="text-gray-600">
+              {modal.message}
+            </p>
+          </div>
         </div>
       )}
     </div>

@@ -12,6 +12,12 @@ export default function CategoryPage() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 
+  const [alertData, setAlertData] = useState({
+    show: false,
+    message: "",
+    onConfirm: null,
+  });
+
   const [formData, setFormData] = useState({
     name: "",
     artist: "",
@@ -60,7 +66,12 @@ export default function CategoryPage() {
     }
   };
 
-  // ================= IMAGE (เลือกได้ทุกช่อง) =================
+  // ================= ALERT =================
+  const showAlert = (message, onConfirm = null) => {
+    setAlertData({ show: true, message, onConfirm });
+  };
+
+  // ================= IMAGE =================
   const handleImageChange = (e, index) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -72,7 +83,7 @@ export default function CategoryPage() {
 
       setFormData(prev => ({
         ...prev,
-        image: updated[0], // รูปหลัก
+        image: updated[0],
         previews: updated
       }));
     };
@@ -82,65 +93,70 @@ export default function CategoryPage() {
   // ================= ADD / EDIT =================
   const handleSubmit = async () => {
     if (!formData.name || !formData.artist || !formData.previews[0]) {
-      return alert("กรอกข้อมูลให้ครบ");
+      return showAlert("กรอกข้อมูลให้ครบ");
     }
 
-    if (!window.confirm(isEdit ? "ยืนยันแก้ไขสินค้า?" : "ยืนยันเพิ่มสินค้า?"))
-      return;
+    showAlert(
+      isEdit ? "ยืนยันแก้ไขสินค้า?" : "ยืนยันเพิ่มสินค้า?",
+      async () => {
+        try {
+          if (isEdit) {
+            await axios.put(
+              `http://localhost:5000/api/product/${editingId}`,
+              formData
+            );
+          } else {
+            await axios.post(
+              "http://localhost:5000/api/product",
+              formData
+            );
+          }
 
-    try {
-      if (isEdit) {
-        await axios.put(`http://localhost:5000/api/product/${editingId}`, formData);
-        alert("แก้ไขสำเร็จ");
-      } else {
-        await axios.post("http://localhost:5000/api/product", formData);
-        alert("เพิ่มสินค้าสำเร็จ");
+          const res = await axios.get(
+            `http://localhost:5000/api/category/${slug}`
+          );
+          setProducts(res.data);
+
+          setShowModal(false);
+          setIsEdit(false);
+          setEditingId(null);
+
+          setFormData({
+            name: "",
+            artist: "",
+            description: "",
+            category: slug,
+            price: "",
+            image: "",
+            previews: ["", "", "", ""],
+          });
+
+        } catch {
+          showAlert("เกิดข้อผิดพลาด");
+        }
       }
-
-      const res = await axios.get(`http://localhost:5000/api/category/${slug}`);
-      setProducts(res.data);
-
-      setShowModal(false);
-      setIsEdit(false);
-      setEditingId(null);
-
-      setFormData({
-        name: "",
-        artist: "",
-        description: "",
-        category: slug,
-        price: "",
-        image: "",
-        previews: ["", "", "", ""],
-      });
-
-    } catch (err) {
-      alert("เกิดข้อผิดพลาด");
-    }
+    );
   };
 
   // ================= DELETE =================
-  const handleDeleteProducts = async () => {
+  const handleDeleteProducts = () => {
     if (!selectedItems.length)
-      return alert("กรุณาเลือกสินค้า");
+      return showAlert("กรุณาเลือกสินค้า");
 
-    if (!window.confirm("แน่ใจหรือไม่ว่าต้องการลบ?"))
-      return;
+    showAlert("แน่ใจหรือไม่ว่าต้องการลบ?", async () => {
+      await Promise.all(
+        selectedItems.map(id =>
+          axios.delete(`http://localhost:5000/api/product/${id}`)
+        )
+      );
 
-    await Promise.all(
-      selectedItems.map(id =>
-        axios.delete(`http://localhost:5000/api/product/${id}`)
-      )
-    );
-
-    alert("ลบสำเร็จ");
-
-    setProducts(products.filter(p => !selectedItems.includes(p._id)));
-    setSelectedItems([]);
-    setSelectAll(false);
+      setProducts(products.filter(p => !selectedItems.includes(p._id)));
+      setSelectedItems([]);
+      setSelectAll(false);
+    });
   };
 
-  // ================= EDIT CLICK =================
+  // ================= EDIT =================
   const handleEdit = (item) => {
     setIsEdit(true);
     setEditingId(item._id);
@@ -159,18 +175,15 @@ export default function CategoryPage() {
   };
 
   return (
-   
-      <div className="min-h-screen flex items-center justify-center bg-[#e9eff3] relative">
+    <div className="min-h-screen bg-[#e9eff3] p-20 relative">
 
       {/* LIST */}
-      <div className="px-20 pt-10 space-y-6">
+      <div className="space-y-6">
         {products.map(item => (
           <div key={item._id}
             className="bg-white rounded-2xl p-6 flex justify-between shadow-sm">
 
             <div className="flex gap-6 items-center">
-
-              {/* BIG CHECKBOX */}
               <input
                 type="checkbox"
                 className="w-6 h-6 accent-[#f28c45]"
@@ -190,13 +203,12 @@ export default function CategoryPage() {
             <div className="flex items-center gap-6">
               <p className="font-semibold">฿{item.price}</p>
 
-              {/* EDIT ICON */}
-              <button onClick={() => handleEdit(item)}
+              <button
+                onClick={() => handleEdit(item)}
                 className="text-gray-500 hover:text-black text-xl">
                 ✏️
               </button>
             </div>
-
           </div>
         ))}
       </div>
@@ -230,85 +242,146 @@ export default function CategoryPage() {
       </div>
 
       {/* MODAL */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white w-[1000px] rounded-3xl p-10 relative">
+    {showModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div className="bg-white w-[820px] rounded-2xl p-8">
 
-            <h2 className="text-2xl text-center font-semibold mb-8">
-              {isEdit ? "แก้ไขสินค้า" : "เพิ่มสินค้า"}
-            </h2>
+      <h2 className="text-xl text-center font-semibold mb-8">
+        {isEdit ? "แก้ไขสินค้า" : "เพิ่มสินค้า"}
+      </h2>
 
-            <div className="grid grid-cols-3 gap-10">
+      {/* ===== TOP SECTION ===== */}
+      <div className="grid grid-cols-2 gap-8 mb-8">
 
-              {/* LEFT IMAGE 4 ช่อง */}
-              <div className="space-y-4">
-                {[0,1,2,3].map(i => (
-                  <label key={i}
-                    className="w-full h-40 bg-gray-200 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden">
-                    {formData.previews[i]
-                      ? <img src={formData.previews[i]} className="w-full h-full object-cover"/>
-                      : <span>เลือกรูป</span>}
-                    <input type="file" hidden
-                      accept="image/*"
-                      onChange={(e)=>handleImageChange(e,i)}/>
-                  </label>
-                ))}
-              </div>
+        {/* รูปใหญ่ */}
+        <label className="h-[260px] bg-gray-200 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden">
+          {formData.previews[0]
+            ? <img src={formData.previews[0]} className="w-full h-full object-cover"/>
+            : <span className="text-gray-500">เลือกรูปหลัก</span>}
+          <input type="file" hidden
+            accept="image/*"
+            onChange={(e)=>handleImageChange(e,0)}/>
+        </label>
 
-              {/* MIDDLE */}
-              <div className="space-y-6">
-                <input className="w-full p-4 border rounded-xl"
-                  placeholder="ชื่อสินค้า"
-                  value={formData.name}
-                  onChange={(e)=>setFormData({...formData,name:e.target.value})}/>
+        {/* รูปเล็ก 3 รูป */}
+        <div className="flex flex-col gap-3">
+          {[1,2,3].map(i => (
+            <label key={i}
+              className="h-[75px] bg-gray-200 rounded-xl flex items-center justify-center cursor-pointer overflow-hidden">
+              {formData.previews[i]
+                ? <img src={formData.previews[i]} className="w-full h-full object-cover"/>
+                : <span className="text-sm text-gray-500">เลือกรูป</span>}
+              <input type="file" hidden
+                accept="image/*"
+                onChange={(e)=>handleImageChange(e,i)}/>
+            </label>
+          ))}
+        </div>
+      </div>
 
-                <input className="w-full p-4 border rounded-xl"
-                  placeholder="ศิลปิน"
-                  value={formData.artist}
-                  onChange={(e)=>setFormData({...formData,artist:e.target.value})}/>
+      {/* ===== FORM ===== */}
+      <div className="space-y-4 mb-8">
 
-                <input className="w-full p-4 border rounded-xl"
-                  type="number"
-                  placeholder="ราคา"
-                  value={formData.price}
-                  onChange={(e)=>setFormData({...formData,price:e.target.value})}/>
+        <input
+          className="w-full p-3 border rounded-lg"
+          placeholder="ชื่อสินค้า"
+          value={formData.name}
+          onChange={(e)=>setFormData({...formData,name:e.target.value})}
+        />
 
-                <textarea className="w-full p-4 border rounded-xl h-32"
-                  placeholder="รายละเอียด"
-                  value={formData.description}
-                  onChange={(e)=>setFormData({...formData,description:e.target.value})}/>
-              </div>
+        <input
+          className="w-full p-3 border rounded-lg"
+          placeholder="ศิลปิน"
+          value={formData.artist}
+          onChange={(e)=>setFormData({...formData,artist:e.target.value})}
+        />
 
-              {/* RIGHT CATEGORY */}
-              <div className="flex flex-col gap-4">
-                {categories.map(cat => (
-                  <button key={cat.slug}
-                    onClick={()=>setFormData({...formData,category:cat.slug})}
-                    className={`p-4 rounded-xl text-left ${
-                      formData.category===cat.slug
-                        ? "bg-[#f28c45] text-white"
-                        : "bg-gray-200"
-                    }`}>
-                    {cat.name}
-                  </button>
-                ))}
-              </div>
-            </div>
+        {/* 🔥 ราคา (ไม่มีลูกศรแล้ว) */}
+        <input
+          type="number"
+          placeholder="ราคา"
+          value={formData.price}
+          onChange={(e)=>setFormData({...formData,price:e.target.value})}
+          className="w-full p-3 border rounded-lg appearance-none
+                     [&::-webkit-outer-spin-button]:appearance-none
+                     [&::-webkit-inner-spin-button]:appearance-none"
+        />
 
-            <div className="text-center mt-10">
+        <textarea
+          className="w-full p-3 border rounded-lg h-24 resize-none"
+          placeholder="รายละเอียด"
+          value={formData.description}
+          onChange={(e)=>setFormData({...formData,description:e.target.value})}
+        />
+
+        {/* หมวดหมู่ */}
+        <div>
+          <p className="mb-2 text-sm font-medium">หมวดหมู่สินค้า</p>
+          <div className="grid grid-cols-3 gap-3">
+            {categories.map(cat => (
               <button
-                onClick={handleSubmit}
-                className="bg-[#f28c45] text-white px-12 py-3 rounded-xl">
-                {isEdit ? "บันทึกการแก้ไข" : "เพิ่มสินค้า"}
+                key={cat.slug}
+                type="button"
+                onClick={() =>
+                  setFormData({ ...formData, category: cat.slug })
+                }
+                className={`p-2 rounded-lg text-sm border transition
+                  ${
+                    formData.category === cat.slug
+                      ? "bg-[#f28c45] text-white border-[#f28c45]"
+                      : "bg-gray-100 hover:bg-gray-200"
+                  }`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+      {/* ===== BUTTON ===== */}
+      <div className="text-center">
+        <button
+          onClick={handleSubmit}
+          className="bg-[#f28c45] text-white px-10 py-2.5 rounded-lg hover:scale-105 transition"
+        >
+          {isEdit ? "บันทึกการแก้ไข" : "เพิ่มสินค้า"}
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
+      {/* ALERT MODAL */}
+      {alertData.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[999]">
+          <div className="bg-white w-[400px] rounded-2xl p-8 text-center shadow-xl">
+            <p className="text-lg font-semibold mb-6">
+              {alertData.message}
+            </p>
+
+            <div className="flex justify-center gap-4">
+              {alertData.onConfirm && (
+                <button
+                  onClick={() => {
+                    alertData.onConfirm();
+                    setAlertData({ show: false, message: "", onConfirm: null });
+                  }}
+                  className="bg-[#f28c45] text-white px-6 py-2 rounded-lg">
+                  ยืนยัน
+                </button>
+              )}
+
+              <button
+                onClick={() =>
+                  setAlertData({ show: false, message: "", onConfirm: null })
+                }
+                className="bg-gray-200 px-6 py-2 rounded-lg">
+                ปิด
               </button>
             </div>
-
-            <button
-              onClick={()=>setShowModal(false)}
-              className="absolute top-4 right-6 text-xl text-gray-400">
-              ✕
-            </button>
-
           </div>
         </div>
       )}

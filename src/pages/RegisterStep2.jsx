@@ -16,7 +16,7 @@ function RegisterStep2() {
     postalCode: "",
   });
 
-  const [toast, setToast] = useState({
+  const [modal, setModal] = useState({
     show: false,
     message: "",
     type: "error",
@@ -25,11 +25,8 @@ function RegisterStep2() {
   const inputStyle =
     "w-full px-4 py-3 rounded-xl bg-[#f9f1ef] border border-[#faa268] focus:outline-none focus:ring-2 focus:ring-[#f99146]";
 
-  const showToast = (message, type = "error") => {
-    setToast({ show: true, message, type });
-    setTimeout(() => {
-      setToast({ show: false, message: "", type: "error" });
-    }, 2500);
+  const showModal = (message, type = "error") => {
+    setModal({ show: true, message, type });
   };
 
   const handleChange = (e) => {
@@ -50,7 +47,7 @@ function RegisterStep2() {
 
   const handleSubmit = async () => {
     if (!step1Data) {
-      showToast("ข้อมูลหาย กรุณากรอกใหม่");
+      showModal("ข้อมูลหาย กรุณากรอกใหม่");
       setTimeout(() => navigate("/register/step1"), 1200);
       return;
     }
@@ -60,13 +57,14 @@ function RegisterStep2() {
     try {
       await axios.post("http://localhost:5000/api/register", allData);
 
-      showToast("สมัครสมาชิกสำเร็จ 🎉", "success");
+      showModal("สมัครสมาชิกสำเร็จ", "success");
 
       setTimeout(() => {
         navigate("/");
       }, 1200);
+
     } catch (err) {
-      showToast("สมัครไม่สำเร็จ");
+      showModal("สมัครไม่สำเร็จ");
     }
   };
 
@@ -78,13 +76,42 @@ function RegisterStep2() {
         </h2>
 
         <div className="space-y-4">
-          <input name="fullName" placeholder="ชื่อ-นามสกุล" onChange={handleChange} className={inputStyle} />
-          <input name="address" placeholder="บ้านเลขที่ / อาคาร" onChange={handleChange} className={inputStyle} />
-          <input name="street" placeholder="ถนน / ตำบล" onChange={handleChange} className={inputStyle} />
-          <input name="province" placeholder="จังหวัด" onChange={handleChange} className={inputStyle} />
+          <input
+            name="fullName"
+            placeholder="ชื่อ-นามสกุล"
+            onChange={handleChange}
+            className={inputStyle}
+          />
+
+          <input
+            name="address"
+            placeholder="บ้านเลขที่ / อาคาร"
+            onChange={handleChange}
+            className={inputStyle}
+          />
+
+          <input
+            name="street"
+            placeholder="ถนน / ตำบล"
+            onChange={handleChange}
+            className={inputStyle}
+          />
+
+          <input
+            name="province"
+            placeholder="จังหวัด"
+            onChange={handleChange}
+            className={inputStyle}
+          />
 
           <div className="grid grid-cols-2 gap-4">
-            <input name="district" placeholder="อำเภอ / เขต" onChange={handleChange} className={inputStyle} />
+            <input
+              name="district"
+              placeholder="อำเภอ / เขต"
+              onChange={handleChange}
+              className={inputStyle}
+            />
+
             <input
               name="postalCode"
               placeholder="รหัสไปรษณีย์"
@@ -115,12 +142,34 @@ function RegisterStep2() {
         </button>
       </div>
 
-      {toast.show && (
-        <div
-          className={`fixed bottom-6 right-6 px-6 py-3 rounded-xl shadow-lg text-white
-          ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}
-        >
-          {toast.message}
+      {/* MODAL */}
+      {modal.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white w-[380px] p-8 rounded-2xl relative text-center">
+
+            <button
+              onClick={() => setModal({ ...modal, show: false })}
+              className="absolute top-3 right-4 text-gray-400 text-xl"
+            >
+              ×
+            </button>
+
+            <h2
+              className={`text-xl font-semibold mb-4 ${
+                modal.type === "success"
+                  ? "text-green-500"
+                  : "text-red-500"
+              }`}
+            >
+              {modal.type === "success"
+                ? "สำเร็จ"
+                : "เกิดข้อผิดพลาด"}
+            </h2>
+
+            <p className="text-gray-600">
+              {modal.message}
+            </p>
+          </div>
         </div>
       )}
     </div>

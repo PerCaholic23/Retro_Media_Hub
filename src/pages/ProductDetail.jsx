@@ -94,7 +94,7 @@ export default function ProductDetail() {
       {/* Toast แจ้งเตือน */}
       {showToast && (
         <div className="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg animate-bounce">
-          ✅ เพิ่มลงตะกร้าแล้ว
+           เพิ่มลงตะกร้าแล้ว
         </div>
       )}
     </div>

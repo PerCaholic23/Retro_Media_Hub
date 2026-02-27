@@ -8,23 +8,25 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: "", type: "error" });
+
+  const [modal, setModal] = useState({
+    show: false,
+    message: "",
+    type: "error",
+  });
 
   const inputStyle =
     "w-full px-4 py-3 rounded-xl bg-[#f9f1ef] border border-[#faa268] focus:outline-none focus:ring-2 focus:ring-[#f99146]";
 
-  const showToast = (message, type = "error") => {
-    setToast({ show: true, message, type });
-    setTimeout(() => {
-      setToast({ show: false, message: "", type: "error" });
-    }, 2500);
+  const showModal = (message, type = "error") => {
+    setModal({ show: true, message, type });
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
-      showToast("กรุณากรอกข้อมูลให้ครบ", "error");
+      showModal("กรุณากรอกข้อมูลให้ครบ", "error");
       return;
     }
 
@@ -37,14 +39,14 @@ function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      showToast("เข้าสู่ระบบสำเร็จ ✅", "success");
+      showModal("เข้าสู่ระบบสำเร็จ", "success");
 
       setTimeout(() => {
         navigate("/home");
-      }, 1000);
+      }, 1200);
 
     } catch (error) {
-      showToast(
+      showModal(
         error.response?.data?.message || "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
         "error"
       );
@@ -74,7 +76,7 @@ function Login() {
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          {/* ช่องรหัสผ่าน + ไอคอนลูกตา */}
+          {/* ช่องรหัสผ่าน */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -87,42 +89,9 @@ function Login() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#f99146] hover:text-[#f47f2a] transition"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#f99146] hover:text-[#f47f2a] transition text-sm"
             >
-              {showPassword ? (
-                /* 👁️ เปิดตา */
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M1.5 12s3.75-7.5 10.5-7.5S22.5 12 22.5 12 18.75 19.5 12 19.5 1.5 12 1.5 12z"
-                  />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-              ) : (
-                /* 🙈 ปิดตา */
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 3l18 18M10.73 5.08A10.94 10.94 0 0112 4.5c6.75 0 10.5 7.5 10.5 7.5a15.72 15.72 0 01-4.21 5.16M6.53 6.53A15.75 15.75 0 001.5 12s3.75 7.5 10.5 7.5c1.61 0 3.08-.36 4.4-1"
-                  />
-                </svg>
-              )}
+              {showPassword ? "ซ่อน" : "แสดง"}
             </button>
           </div>
 
@@ -134,26 +103,44 @@ function Login() {
           </button>
         </form>
 
-        <div className="text-center text-sm text-gray-700 mt-6 space-y-2">
-          <p>
-            ยังไม่มีบัญชีใช่ไหม?{" "}
-            <span
-              onClick={() => navigate("/register/step1")}
-              className="font-medium cursor-pointer underline"
-            >
-              สมัครสมาชิก
-            </span>
-          </p>
+        <div className="text-center text-sm text-gray-700 mt-6">
+          ยังไม่มีบัญชีใช่ไหม?{" "}
+          <span
+            onClick={() => navigate("/register/step1")}
+            className="font-medium cursor-pointer underline"
+          >
+            สมัครสมาชิก
+          </span>
         </div>
       </div>
 
-      {/* Toast */}
-      {toast.show && (
-        <div
-          className={`fixed bottom-6 right-6 px-6 py-3 rounded-xl shadow-lg text-white transition 
-          ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}
-        >
-          {toast.message}
+      {/* MODAL */}
+      {modal.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white w-[380px] p-8 rounded-2xl relative text-center">
+
+            <button
+              onClick={() => setModal({ ...modal, show: false })}
+              className="absolute top-3 right-4 text-gray-400 text-xl"
+            >
+              ✕
+            </button>
+
+            <h2
+              className={`text-2xl font-semibold mb-4 ${
+                modal.type === "success"
+                  ? "text-green-500"
+                  : "text-red-500"
+              }`}
+            >
+              {modal.type === "success" ? "สำเร็จ" : "เกิดข้อผิดพลาด"}
+            </h2>
+
+            <p className="text-gray-600">
+              {modal.message}
+            </p>
+
+          </div>
         </div>
       )}
     </div>
