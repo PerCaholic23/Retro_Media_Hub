@@ -7,6 +7,12 @@ const productSchema = new mongoose.Schema({
   category: String, // cd, vinyl, etc
   price: Number,
   image: String, // for now store image URL or base64
+
+  owner: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  required: true
+}
 }, { timestamps: true });
 
 module.exports = mongoose.model("Product", productSchema);

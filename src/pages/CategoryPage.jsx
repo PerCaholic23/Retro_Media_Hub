@@ -12,6 +12,9 @@ export default function CategoryPage() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 
+  const token = localStorage.getItem("token");
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+
   const [alertData, setAlertData] = useState({
     show: false,
     message: "",
@@ -38,7 +41,14 @@ export default function CategoryPage() {
 
   // ================= FETCH =================
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/category/${slug}`)
+    axios.get(
+  `http://localhost:5000/api/my-products/${slug}`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+)
       .then(res => {
         setProducts(res.data);
         setSelectedItems([]);
@@ -102,13 +112,25 @@ export default function CategoryPage() {
         try {
           if (isEdit) {
             await axios.put(
-              `http://localhost:5000/api/product/${editingId}`,
-              formData
-            );
+            `http://localhost:5000/api/product/${editingId}`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            }
+          );
           } else {
+            
+
             await axios.post(
               "http://localhost:5000/api/product",
-              formData
+              formData,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`
+                }
+              }
             );
           }
 
@@ -146,7 +168,14 @@ export default function CategoryPage() {
     showAlert("แน่ใจหรือไม่ว่าต้องการลบ?", async () => {
       await Promise.all(
         selectedItems.map(id =>
-          axios.delete(`http://localhost:5000/api/product/${id}`)
+         axios.delete(
+          `http://localhost:5000/api/product/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
         )
       );
 

@@ -133,6 +133,27 @@ app.put("/api/profile/:id", async (req, res) => {
   }
 });
 
+const authMiddleware = (req, res, next) => {
+  const header = req.headers.authorization;
+
+  if (!header)
+    return res.status(401).json({ message: "No token" });
+
+  const token = header.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "fallback_secret"
+    );
+
+    req.user = decoded;
+    next();
+  } catch {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+};
+
 /* =================================================
    PRODUCT SECTION
 ================================================= */
@@ -166,55 +187,77 @@ app.get("/api/category/:slug", async (req, res) => {
   try {
     const products = await Product.find({
       category: req.params.slug
-    });
+    }).populate("owner", "username");
+
     res.json(products);
-  } catch (err) {
+  } catch {
     res.status(500).json({ message: "Server error" });
   }
 });
 
 // เพิ่มสินค้า
-app.post("/api/product", async (req, res) => {
+app.post("/api/product", authMiddleware, async (req, res) => {
   try {
-    const product = new Product(req.body);
+    const product = new Product({
+      ...req.body,
+      owner: req.user.id
+    });
+
     await product.save();
-    res.json({ message: "Product added", product });
-  } catch (err) {
+    res.json(product);
+
+  } catch {
     res.status(500).json({ message: "Server error" });
   }
 });
 
 // ลบสินค้า
-app.delete("/api/product/:id", async (req, res) => {
+app.put("/api/product/:id", authMiddleware, async (req, res) => {
   try {
-    await Product.findByIdAndDelete(req.params.id);
-    res.json({ message: "ลบสินค้าสำเร็จ" });
-  } catch (err) {
-    res.status(500).json({ message: "ลบไม่สำเร็จ" });
-  }
-});
-
-// แก้ไขสินค้า
-app.put("/api/product/:id", async (req, res) => {
-  try {
-    const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id,
+    const updated = await Product.findOneAndUpdate(
+      { _id: req.params.id, owner: req.user.id },
       { $set: req.body },
       { new: true }
     );
 
-    if (!updatedProduct) {
-      return res.status(404).json({ message: "ไม่พบสินค้า" });
-    }
+    if (!updated)
+      return res.status(403).json({ message: "Not your product" });
 
-    res.json({
-      message: "แก้ไขสำเร็จ",
-      product: updatedProduct
+    res.json(updated);
+
+  } catch {
+    res.status(500).json({ message: "Update failed" });
+  }
+});
+
+// แก้ไขสินค้า
+app.delete("/api/product/:id", authMiddleware, async (req, res) => {
+  try {
+    const deleted = await Product.findOneAndDelete({
+      _id: req.params.id,
+      owner: req.user.id
     });
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "แก้ไขไม่สำเร็จ" });
+    if (!deleted)
+      return res.status(403).json({ message: "Not your product" });
+
+    res.json({ message: "Deleted" });
+
+  } catch {
+    res.status(500).json({ message: "Delete failed" });
+  }
+});
+
+app.get("/api/my-products/:slug", authMiddleware, async (req, res) => {
+  try {
+    const products = await Product.find({
+      category: req.params.slug,
+      owner: req.user.id
+    });
+
+    res.json(products);
+  } catch {
+    res.status(500).json({ message: "Server error" });
   }
 });
 
