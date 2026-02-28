@@ -53,54 +53,31 @@ export default function Checkout() {
   }, []);
 
   /* ================= HANDLE ORDER ================= */
-  const handleOrder = async () => {
+  const handleOrder = () => {
     if (itemsToCheckout.length === 0) {
       alert("ไม่มีสินค้าในรายการ");
       return;
     }
 
-    try {
-      const token = localStorage.getItem("token");
+    clearCart();
 
-      const res = await fetch("http://localhost:5000/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          items: itemsToCheckout,
-          paymentMethod,
-          shippingFee,
-          total,
-        }),
-      });
-
-      if (res.ok) {
-        clearCart();
-
-        if (paymentMethod === "qr") {
-          setShowQRModal(true);
-        } else {
-          setShowSuccessModal(true);
-        }
-      } else {
-        alert("เกิดข้อผิดพลาด");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Server error");
+    if (paymentMethod === "qr") {
+      setShowQRModal(true);
+    } else {
+      setShowSuccessModal(true);
     }
   };
 
   return (
-    <div className="px-24 py-10 pb-40 space-y-8">
+    <div className="min-h-screen flex flex-col px-24 py-10 pb-40 space-y-8">
 
       {/* ================= รายการสินค้า ================= */}
       <div className="bg-white rounded-3xl p-6 shadow-md space-y-6">
         {itemsToCheckout.map((item) => (
-          <div key={item.id}
-            className="flex items-center justify-between border-b pb-4">
+          <div
+            key={item.id}
+            className="flex items-center justify-between border-b pb-4"
+          >
             <div className="flex items-center gap-6">
               <div className="w-20 h-20 bg-gray-300 rounded-xl flex items-center justify-center text-white">
                 IMG
@@ -149,7 +126,7 @@ export default function Checkout() {
         <div className="flex gap-4">
           <button
             onClick={() => setPaymentMethod("qr")}
-            className={`px-6 py-3 rounded-xl border ${
+            className={`px-6 py-3 rounded-xl border transition ${
               paymentMethod === "qr"
                 ? "bg-orange-400 text-white"
                 : "bg-white"
@@ -160,7 +137,7 @@ export default function Checkout() {
 
           <button
             onClick={() => setPaymentMethod("cod")}
-            className={`px-6 py-3 rounded-xl border ${
+            className={`px-6 py-3 rounded-xl border transition ${
               paymentMethod === "cod"
                 ? "bg-orange-400 text-white"
                 : "bg-white"
@@ -191,8 +168,9 @@ export default function Checkout() {
 
       {/* ================= QR MODAL ================= */}
       {showQRModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white w-[400px] p-8 rounded-2xl relative text-center">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white w-[420px] p-8 rounded-3xl relative text-center">
+
             <button
               onClick={() => {
                 setShowQRModal(false);
@@ -203,18 +181,18 @@ export default function Checkout() {
               ✕
             </button>
 
-            <h2 className="text-xl font-semibold mb-6">
-              กรุณาชำระเงินผ่าน QR
+            <h2 className="text-xl font-semibold mb-6 text-orange-500">
+              กรุณาชำระเงินผ่าน QR พร้อมเพย์
             </h2>
 
-            {/* อนาคตเปลี่ยนเป็น QR ร้าน */}
-            <div className="w-60 h-60 bg-gray-300 mx-auto rounded-xl flex items-center justify-center">
+            <div className="w-64 h-64 bg-gray-300 mx-auto rounded-2xl flex items-center justify-center text-gray-500 text-lg shadow-inner">
               QR IMAGE
             </div>
 
-            <p className="mt-4 text-gray-500">
+            <p className="mt-6 text-gray-600">
               สแกนเพื่อชำระเงิน ฿{total}
             </p>
+
           </div>
         </div>
       )}
@@ -222,24 +200,26 @@ export default function Checkout() {
       {/* ================= SUCCESS MODAL ================= */}
       {showSuccessModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white w-[400px] p-8 rounded-2xl relative text-center">
+          <div className="bg-white w-[400px] p-8 rounded-3xl text-center shadow-xl">
+
+            <h2 className="text-2xl font-semibold text-green-500 mb-4">
+              สั่งซื้อเสร็จสิ้น
+            </h2>
+
+            <p className="text-gray-600 mb-6">
+              ระบบได้รับคำสั่งซื้อเรียบร้อยแล้ว
+            </p>
+
             <button
               onClick={() => {
                 setShowSuccessModal(false);
                 navigate("/home");
               }}
-              className="absolute top-3 right-4 text-gray-400 text-xl"
+              className="bg-[#f28c45] text-white px-8 py-3 rounded-xl hover:scale-105 transition"
             >
-              ✕
+              กลับหน้าแรก
             </button>
 
-            <h2 className="text-2xl font-semibold text-green-500 mb-4">
-              🎉 สั่งซื้อสำเร็จ
-            </h2>
-
-            <p className="text-gray-600">
-              ขอบคุณสำหรับการสั่งซื้อ
-            </p>
           </div>
         </div>
       )}

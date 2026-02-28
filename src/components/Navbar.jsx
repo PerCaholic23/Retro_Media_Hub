@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
+// ===== IMPORT IMAGES =====
+import Logo from "../image/LogoText.png";
+import ProfileIcon from "../image/ProfileIcon.png";
+import CartIcon from "../image/CartIcon.png";
+
 export default function Navbar() {
   const [showFilter, setShowFilter] = useState(false);
   const navigate = useNavigate();
@@ -31,17 +36,17 @@ export default function Navbar() {
     <nav className="sticky top-0 bg-[#e9eff3] px-20 py-4 z-50 shadow">
       <div className="grid grid-cols-5 items-center">
 
-        {/* LOGO */}
+        {/* ===== LOGO (ใหญ่ขึ้น) ===== */}
         <div>
-          <h1
+          <img
+            src={Logo}
+            alt="Logo"
             onClick={() => navigate("/")}
-            className="text-2xl font-bold cursor-pointer"
-          >
-            <span className="text-[#f28c45]">Retro</span>MediaHub
-          </h1>
+            className="h-14 cursor-pointer"   // 👈 เดิม h-10
+          />
         </div>
 
-        {/* หน้าหลัก */}
+        {/* ===== หน้าหลัก ===== */}
         <div className="text-center">
           <button
             onClick={() => navigate("/home")}
@@ -51,7 +56,7 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* สินค้า Dropdown */}
+        {/* ===== สินค้า Dropdown ===== */}
         <div className="text-center relative">
           <button
             onClick={() => setShowFilter(!showFilter)}
@@ -75,21 +80,21 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* ค้นหา */}
+        {/* ===== ค้นหา (เอา CD ออก เอาแว่นขยายกลับมา) ===== */}
         <div className="flex justify-center">
-          <div className="flex items-center bg-white rounded-full shadow px-5 py-2 w-80">
+          <div className="flex items-center bg-white rounded-full shadow px-5 py-2 w-96">
             <input
               type="text"
               placeholder="ค้นหาสินค้า..."
               value={search}
               onChange={handleSearchChange}
-              className="outline-none px-2 w-full"
+              className="outline-none px-2 w-full text-lg"
             />
 
-            {/* 🔍 Search Icon */}
+            {/* 🔍 แว่นขยาย SVG เดิม */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5 text-black hover:text-gray-600 transition"
+              className="w-6 h-6 text-black hover:text-gray-600 transition"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -101,45 +106,27 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Profile + Cart */}
-        <div className="flex justify-end items-center gap-6">
+        {/* ===== Profile + Cart ===== */}
+        <div className="flex justify-end items-center gap-8">
 
-          {/* Profile */}
-          <div
+          {/* ===== Profile (ใหญ่ขึ้น + เอาวงกลมออก) ===== */}
+          <img
+            src={ProfileIcon}
+            alt="profile"
             onClick={() => navigate("/profile")}
-            className="w-10 h-10 rounded-full border-2 border-black flex items-center justify-center cursor-pointer hover:bg-black hover:text-white transition"
-          >
-            {/* 👤 Profile Icon */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <circle cx="12" cy="7" r="4" />
-              <path d="M5.5 21a6.5 6.5 0 0113 0" />
-            </svg>
-          </div>
+            className="w-10 h-10 cursor-pointer hover:scale-110 transition"
+          />
 
-          {/* 🛒 Cart */}
+          {/* ===== Cart (ใหญ่ขึ้นเล็กน้อย) ===== */}
           <button
             onClick={() => navigate("/cart")}
             className="hover:scale-110 transition"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-6 h-6 text-black hover:text-gray-600 transition"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <circle cx="9" cy="21" r="1" />
-              <circle cx="20" cy="21" r="1" />
-              <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h7.72a2 2 0 002-1.61L23 6H6" />
-            </svg>
+            <img
+              src={CartIcon}
+              alt="cart"
+              className="w-8 h-8"
+            />
           </button>
 
         </div>

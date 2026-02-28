@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Logo from "../image/LogoText.png";   // 👈 เพิ่มบรรทัดนี้
 
 function Login() {
   const navigate = useNavigate();
@@ -57,10 +58,13 @@ function Login() {
     <div className="min-h-screen flex items-center justify-center bg-[#de490a] relative">
       <div className="w-full max-w-md bg-[#f6d5cd] rounded-3xl shadow-xl p-8">
 
+        {/* ===== โลโก้ ===== */}
         <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 text-sm">
-            โลโก้
-          </div>
+          <img
+            src={Logo}
+            alt="Logo"
+            className="h-20 object-contain"   // 👈 ปรับขนาดได้ที่นี่
+          />
         </div>
 
         <h2 className="text-2xl font-bold text-center mb-6">

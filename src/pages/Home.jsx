@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import ShopIcon from "../image/ShopIcon.png";
+
 export default function Home() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,23 +57,13 @@ export default function Home() {
   onClick={() => navigate("/store")}
   className="mt-8 bg-[#f28c45] text-white px-8 py-3 rounded-2xl shadow-lg hover:scale-105 transition flex items-center gap-3"
 >
-  {/* Store Icon */}
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="w-6 h-6"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
-  >
-    <path d="M3 9l1-4h16l1 4" />
-    <path d="M4 9h16v11H4z" />
-    <path d="M9 22V12h6v10" />
-  </svg>
-
+  <img
+    src={ShopIcon}
+    alt="store"
+    className="w-7 h-7 object-contain"
+  />
   ร้านค้าของคุณ
 </button>
-
             <div className="mt-10 bg-[#d6dee4] p-6 rounded-3xl w-[420px] shadow-md">
               <h3 className="font-semibold mb-4 text-lg">รายการสินค้าแนะนำ</h3>
               {products.slice(0, 2).map((item) => (

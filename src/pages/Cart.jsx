@@ -24,8 +24,8 @@ export default function Cart() {
 
   return (
     
-    <div className="px-24 py-10">
-     
+    <div className="min-h-screen flex flex-col px-24 py-10">
+    
       {/* =========================
          รายการสินค้า
       ========================= */}

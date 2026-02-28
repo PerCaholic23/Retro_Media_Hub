@@ -12,6 +12,7 @@ import { CartProvider } from "./context/CartContext";
 import Checkout from "./pages/Checkout";
 import Store from "./pages/Store";
 import CategoryPage from "./pages/CategoryPage";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/store" element={<Store />} />
           <Route path="/category/:slug" element={<CategoryPage />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route
   path="/checkout"
   element={

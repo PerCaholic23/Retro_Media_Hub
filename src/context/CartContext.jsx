@@ -34,10 +34,18 @@ export function CartProvider({ children }) {
   };
 
   const toggleAll = () => {
-    const allChecked = cartItems.every((item) => item.checked);
-    setCartItems((prev) =>
-      prev.map((item) => ({ ...item, checked: !allChecked }))
-    );
+    setCartItems((prev) => {
+      const allChecked = prev.every((item) => item.checked);
+      return prev.map((item) => ({
+        ...item,
+        checked: !allChecked,
+      }));
+    });
+  };
+
+  // ✅ เพิ่มฟังก์ชันนี้
+  const clearCart = () => {
+    setCartItems([]);
   };
 
   return (
@@ -48,6 +56,7 @@ export function CartProvider({ children }) {
         removeFromCart,
         toggleItem,
         toggleAll,
+        clearCart, // ✅ อย่าลืมใส่ตรงนี้
       }}
     >
       {children}

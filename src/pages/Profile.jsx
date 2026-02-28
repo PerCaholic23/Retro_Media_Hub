@@ -66,39 +66,76 @@ export default function Profile() {
   };
 
   const handleSave = async () => {
-    try {
-      const storedUser = JSON.parse(localStorage.getItem("user"));
-      const token = localStorage.getItem("token");
+  // ===== VALIDATION =====
+  if (
+    !user.fullName ||
+    !user.email ||
+    !user.phone ||
+    !user.address ||
+    !user.street ||
+    !user.province ||
+    !user.district ||
+    !user.postalCode
+  ) {
+    showToast("กรุณากรอกข้อมูลให้ครบทุกช่อง", "error");
+    return;
+  }
 
-      if (!storedUser || !storedUser.id) {
-        showToast("ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่", "error");
-        return;
-      }
+  // ตรวจสอบ email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(user.email)) {
+    showToast("รูปแบบอีเมลไม่ถูกต้อง", "error");
+    return;
+  }
 
-      await axios.put(
-        `http://localhost:5000/api/profile/${storedUser.id}`,
-        user,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  // ตรวจสอบเบอร์โทร (ตัวเลข 10 หลัก)
+  const phoneRegex = /^[0-9]{10}$/;
+  if (!phoneRegex.test(user.phone)) {
+    showToast("เบอร์โทรต้องเป็นตัวเลข 10 หลัก", "error");
+    return;
+  }
 
-      showToast("บันทึกข้อมูลสำเร็จ", "success");
+  // ตรวจสอบรหัสไปรษณีย์ (5 หลัก)
+  const postalRegex = /^[0-9]{5}$/;
+  if (!postalRegex.test(user.postalCode)) {
+    showToast("รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก", "error");
+    return;
+  }
 
-    } catch (err) {
-      if (!err.response) {
-        showToast("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้", "error");
-      } else {
-        showToast(
-          err.response?.data?.message ||
-            "เกิดข้อผิดพลาดในการบันทึกข้อมูล",
-          "error"
-        );
-      }
+  // ===== SAVE =====
+  try {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const token = localStorage.getItem("token");
+
+    if (!storedUser || !storedUser.id) {
+      showToast("ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่", "error");
+      return;
     }
-  };
+
+    await axios.put(
+      `http://localhost:5000/api/profile/${storedUser.id}`,
+      user,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    showToast("บันทึกข้อมูลสำเร็จ", "success");
+
+  } catch (err) {
+    if (!err.response) {
+      showToast("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้", "error");
+    } else {
+      showToast(
+        err.response?.data?.message ||
+          "เกิดข้อผิดพลาดในการบันทึกข้อมูล",
+        "error"
+      );
+    }
+  }
+};
 
   return (
     <div className="bg-[#e9eff3] min-h-screen font-prompt p-10 md:p-20 relative">
