@@ -159,20 +159,26 @@ const authMiddleware = (req, res, next) => {
 ================================================= */
 
 // ดึงจำนวน stock ตามหมวด (dynamic จาก DB)
-app.get("/api/category", async (req, res) => {
+app.get("/api/category", authMiddleware, async (req, res) => {
   try {
     const result = await Product.aggregate([
       {
+        $match: {
+          owner: new mongoose.Types.ObjectId(req.user.id)
+        }
+      },
+
+      {
         $group: {
           _id: "$category",
-          totalStock: { $sum: 1 }
+          productCount: { $sum: 1 }
         }
       }
     ]);
 
     const formatted = result.map(item => ({
       category_slug: item._id,
-      totalStock: item.totalStock
+      productCount: item.productCount
     }));
 
     res.json(formatted);

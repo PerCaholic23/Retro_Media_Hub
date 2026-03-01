@@ -23,8 +23,11 @@ export default function Store() {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/category")
+    axios.get("http://localhost:5000/api/category", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    })
       .then((res) => {
         const defaultCategories = [
           { name: "CD เพลง", slug: "cd" },
@@ -41,7 +44,7 @@ export default function Store() {
 
           return {
             ...cat,
-            stock: found ? found.totalStock : 0,
+            stock: found ? found.productCount : 0,
           };
         });
 
