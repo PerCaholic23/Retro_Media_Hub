@@ -6,6 +6,7 @@ const productSchema = new mongoose.Schema({
   description: String,
   category: String, // cd, vinyl, etc
   price: Number,
+  stock: { type: Number, default: 0 },
   image: String, // for now store image URL or base64
 
   owner: {

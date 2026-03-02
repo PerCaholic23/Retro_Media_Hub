@@ -27,10 +27,11 @@ export default function Dashboard() {
 
     const mockData = [
       { month: "ม.ค.", revenue: 20000, expense: 12000 },
-      { month: "ก.พ.", revenue: 35000, expense: 18000 },
-      { month: "มี.ค.", revenue: 28000, expense: 15000 },
+      { month: "ก.พ.", revenue: 35000, expense: 0 },
+      { month: "มี.ค.", revenue: 28000, expense: 0 },
       { month: "เม.ย.", revenue: 40000, expense: 20000 },
       { month: "พ.ค.", revenue: 45000, expense: 22000 },
+      { month: "มิ.ย.", revenue: 16000, expense: 0 },
     ];
 
     const formatted = mockData.map(item => ({

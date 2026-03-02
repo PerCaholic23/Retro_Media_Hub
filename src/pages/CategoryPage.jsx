@@ -27,6 +27,7 @@ export default function CategoryPage() {
     description: "",
     category: slug,
     price: "",
+    stock: "1",
     image: "",
     previews: ["", "", "", ""],
   });
@@ -230,14 +231,18 @@ export default function CategoryPage() {
             </div>
 
             <div className="flex items-center gap-6">
-              <p className="font-semibold">฿{item.price}</p>
+  {/* เพิ่มการแสดงจำนวนตรงนี้ */}
+  <div className="text-right mr-4">
+    <p className="font-semibold text-orange-500">฿{item.price}</p>
+    <p className="text-xs text-gray-400">คงเหลือ: {item.stock || 0}</p>
+  </div>
 
-              <button
-                onClick={() => handleEdit(item)}
-                className="text-gray-500 hover:text-black text-xl">
-                ✏️
-              </button>
-            </div>
+  <button
+    onClick={() => handleEdit(item)}
+    className="text-gray-500 hover:text-black text-xl">
+    ✏️
+  </button>
+</div>
           </div>
         ))}
       </div>
@@ -335,14 +340,7 @@ export default function CategoryPage() {
               />
 
               {/* 🔥 ราคา (ไม่มีลูกศรแล้ว) */}
-              <input
-                placeholder="ราคา"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                className="w-full p-3 border rounded-lg appearance-none
-                     [&::-webkit-outer-spin-button]:appearance-none
-                     [&::-webkit-inner-spin-button]:appearance-none"
-              />
+              
 
               <textarea
                 className="w-full p-3 border rounded-lg h-24 resize-none"
@@ -350,6 +348,31 @@ export default function CategoryPage() {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               />
+
+              {/* เพิ่มส่วนนี้ก่อนถึงหัวข้อหมวดหมู่สินค้า */}
+<div className="grid grid-cols-2 gap-4">
+  <div>
+    <p className="mb-2 text-sm font-medium">ราคา (฿)</p>
+    <input
+      
+      placeholder="ราคา"
+      value={formData.price}
+      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+      className="w-full p-3 border rounded-lg appearance-none"
+    />
+  </div>
+  <div>
+    <p className="mb-2 text-sm font-medium">จำนวนในคลัง (Stock)</p>
+    <input
+      type="number"
+      placeholder="จำนวน"
+      value={formData.stock}
+      onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+      className="w-full p-3 border rounded-lg"
+      min="0"
+    />
+  </div>
+</div>
 
               {/* หมวดหมู่ */}
               <div>
