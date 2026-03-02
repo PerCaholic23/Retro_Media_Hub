@@ -288,6 +288,33 @@ app.get("/api/my-products/:slug", authMiddleware, async (req, res) => {
   }
 });
 
+// Get all products (for homepage)
+app.get("/api/products", authMiddleware, async (req, res) => {
+  try {
+    const { search, category } = req.query;
+
+    let filter = {
+      owner: { $ne: req.user.id }
+    };
+
+    if (search) {
+      filter.name = { $regex: search, $options: "i" };
+    }
+
+    if (category) {
+      filter.category = category;
+    }
+
+    const products = await Product.find(filter)
+      .populate("owner", "username");
+
+    res.json(products);
+
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 /* ================================================= */
 
 app.listen(5000, () => {

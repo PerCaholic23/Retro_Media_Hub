@@ -22,26 +22,53 @@ export default function Home() {
     // else if (savedUser) { setUser(JSON.parse(savedUser)); }
   }, [navigate]); // เพิ่ม navigate ตรงนี้
 
-  const products = [
-    { id: 1, name: "CD เพลง Rock มือสอง", price: 450 },
-    { id: 2, name: "เสื้อวง Nirvana วินเทจ", price: 890 },
-    { id: 3, name: "แผ่นเสียง Beatles แท้", price: 1200 },
-    { id: 4, name: "โปสเตอร์ศิลปิน Queen", price: 350 },
-    { id: 5, name: "เทปคาสเซ็ท Classic", price: 250 },
-  ];
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredProducts = products.filter((product) => {
-    const matchSearch = searchQuery
-      ? product.name.toLowerCase().includes(searchQuery.toLowerCase())
-      : true;
-    const matchCategory = categoryQuery
-      ? product.name.toLowerCase().includes(categoryQuery.toLowerCase())
-      : true;
-    return matchSearch && matchCategory;
-  });
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        setLoading(true);
+
+        const query = new URLSearchParams();
+
+        if (searchQuery) query.append("search", searchQuery);
+        if (categoryQuery) query.append("category", categoryQuery);
+
+        const res = await fetch(
+          `http://localhost:5000/api/products?${query.toString()}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        const data = await res.json();
+        setProducts(data);
+
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [searchQuery, categoryQuery]);
+
+
 
   if (!localStorage.getItem("token")) return null;
-
+  //////////Add loading screen to wait for database to complete
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#e9eff3]">
+        <p className="text-xl font-medium">Loading products...</p>
+      </div>
+    );
+  }
   return (
     <div className="bg-[#e9eff3] font-prompt min-h-screen">
       {!searchQuery && !categoryQuery && (
@@ -54,25 +81,37 @@ export default function Home() {
             <h3 className="text-5xl font-bold leading-tight ml-10">มือสอง</h3>
 
             <button
-  onClick={() => navigate("/store")}
-  className="mt-8 bg-[#f28c45] text-white px-8 py-3 rounded-2xl shadow-lg hover:scale-105 transition flex items-center gap-3"
->
-  <img
-    src={ShopIcon}
-    alt="store"
-    className="w-7 h-7 object-contain"
-  />
-  ร้านค้าของคุณ
-</button>
+              onClick={() => navigate("/store")}
+              className="mt-8 bg-[#f28c45] text-white px-8 py-3 rounded-2xl shadow-lg hover:scale-105 transition flex items-center gap-3"
+            >
+              <img
+                src={ShopIcon}
+                alt="store"
+                className="w-7 h-7 object-contain"
+              />
+              ร้านค้าของคุณ
+            </button>
             <div className="mt-10 bg-[#d6dee4] p-6 rounded-3xl w-[420px] shadow-md">
               <h3 className="font-semibold mb-4 text-lg">รายการสินค้าแนะนำ</h3>
               {products.slice(0, 2).map((item) => (
                 <div
-                  key={item.id}
-                  onClick={() => navigate(`/product/${item.id}`)}
+                  key={item._id}
+                  onClick={() => navigate(`/product/${item._id}`)}
                   className="flex gap-4 bg-[#eef3f7] p-4 rounded-2xl mb-4 cursor-pointer hover:scale-[1.02] transition"
                 >
-                  <div className="w-14 h-14 bg-gray-400 rounded-xl flex items-center justify-center text-white text-xs">IMG</div>
+                  <div className="w-14 h-14 rounded-xl overflow-hidden">
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-300 flex items-center justify-center text-xs text-white">
+                        No Img
+                      </div>
+                    )}
+                  </div>
                   <div>
                     <p className="text-sm">{item.name}</p>
                     <p className="text-sm font-medium">฿{item.price}</p>
@@ -83,7 +122,7 @@ export default function Home() {
           </div>
 
           <div className="relative w-[650px] h-[650px]">
-            <div 
+            <div
               onClick={() => navigate("/home?category=CD เพลง")}
               className="absolute top-[160px] left-[0px] w-[360px] h-[360px] rounded-full bg-white z-20 shadow-xl flex items-center justify-center overflow-hidden cursor-pointer hover:scale-105 transition border-4 border-white"
             >
@@ -91,25 +130,25 @@ export default function Home() {
               <span className="absolute bottom-6 bg-white px-5 py-2 rounded-xl shadow text-black font-bold">CD เพลง</span>
             </div>
 
-            <SmallCircle 
-              text="แผ่นเสียง" 
+            <SmallCircle
+              text="แผ่นเสียง"
               image="https://i.pinimg.com/736x/4b/c8/6d/4bc86d00722fd941baededbae9411845.jpg"
-              className="top-[-10px] left-[200px] z-10" 
+              className="top-[-10px] left-[200px] z-10"
             />
-            <SmallCircle 
-              text="เทปคาสเซ็ท" 
+            <SmallCircle
+              text="เทปคาสเซ็ท"
               image="https://i.pinimg.com/1200x/00/00/99/000099d11fdec13320997e182e968f5f.jpg"
-              className="top-[100px] left-[340px] z-10" 
+              className="top-[100px] left-[340px] z-10"
             />
-            <SmallCircle 
-              text="โปสเตอร์ศิลปิน" 
+            <SmallCircle
+              text="โปสเตอร์ศิลปิน"
               image="https://i.pinimg.com/736x/6e/0a/2b/6e0a2b2826c82a28084348e7a0004bbb.jpg"
-              className="bottom-[220px] left-[390px] z-10" 
+              className="bottom-[220px] left-[390px] z-10"
             />
-            <SmallCircle 
-              text="เสื้อวง" 
+            <SmallCircle
+              text="เสื้อวง"
               image="https://i.pinimg.com/736x/01/03/4d/01034d08a5985dd64c0af29afda50ca6.jpg"
-              className="bottom-[45px] left-[330px] z-10" 
+              className="bottom-[45px] left-[330px] z-10"
             />
           </div>
         </div>
@@ -128,14 +167,26 @@ export default function Home() {
             </h2>
 
             <div className="grid grid-cols-3 gap-8">
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map((item) => (
+              {products.length > 0 ? (
+                products.map((item) => (
                   <div
-                    key={item.id}
-                    onClick={() => navigate(`/product/${item.id}`)}
+                    key={item._id}
+                    onClick={() => navigate(`/product/${item._id}`)}
                     className="bg-white p-6 rounded-3xl shadow-md hover:shadow-xl hover:scale-105 cursor-pointer transition"
                   >
-                    <div className="w-full h-40 bg-gray-300 rounded-2xl flex items-center justify-center text-white mb-4">IMAGE</div>
+                    <div className="w-full h-40 rounded-2xl overflow-hidden mb-4">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-300 flex items-center justify-center text-white">
+                          No Image
+                        </div>
+                      )}
+                    </div>
                     <h3 className="font-semibold mb-2">{item.name}</h3>
                     <p className="text-[#f28c45] font-medium">฿{item.price}</p>
                   </div>
@@ -153,10 +204,9 @@ export default function Home() {
 
 function SmallCircle({ text, className, image }) {
   const navigate = useNavigate();
-
   return (
-    <div 
-      onClick={() => navigate(`/home?category=${text}`)} 
+    <div
+      onClick={() => navigate(`/home?category=${text}`)}
       className={`absolute flex flex-col items-center cursor-pointer hover:scale-200 transition active:scale-95 ${className}`}
     >
       <div className="w-[150px] h-[150px] rounded-full bg-white shadow-md flex items-center justify-center overflow-hidden border-2 border-gray-100 relative">

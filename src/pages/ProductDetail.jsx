@@ -1,25 +1,54 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [showToast, setShowToast] = useState(false);
-  
+
   // 1. เพิ่ม State สำหรับเก็บจำนวนสินค้าที่เลือก
   const [quantity, setQuantity] = useState(1);
 
-  const products = [
-    { id: 1, name: "CD เพลง Rock มือสอง", price: 450, desc: "แผ่น CD มือสอง สภาพดี" },
-    { id: 2, name: "เสื้อ Nirvana วินเทจ", price: 890, desc: "เสื้อวงแท้ ปี 90s" },
-    { id: 3, name: "แผ่นเสียง Beatles แท้", price: 1200, desc: "Vinyl แท้จาก UK" },
-    { id: 4, name: "โปสเตอร์ Queen", price: 350, desc: "โปสเตอร์สะสมหายาก" },
-    { id: 5, name: "เทป Classic", price: 250, desc: "เทปเพลงคลาสสิค" },
-  ];
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const product = products.find((item) => item.id === Number(id));
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(
+          `http://localhost:5000/api/product/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || "Error");
+        }
+
+        setProduct(data);
+      } catch (err) {
+        console.error(err);
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return <div className="p-20 text-center">กำลังโหลด...</div>;
+  }
 
   if (!product) {
     return <div className="p-20 text-center">ไม่พบสินค้า</div>;
@@ -61,8 +90,15 @@ export default function ProductDetail() {
       <div className="px-24 py-16 flex gap-16">
         {/* IMAGE */}
         <div className="w-1/2 h-[450px] bg-white rounded-3xl shadow-sm border border-gray-100 flex items-center justify-center text-gray-300 text-2xl overflow-hidden">
-           {/* ใส่ <img src={product.image} ... /> ตรงนี้ได้เลย */}
-           IMAGE
+          {product.image ? (
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="text-gray-400">No Image</div>
+          )}
         </div>
 
         {/* DETAILS */}
@@ -73,14 +109,14 @@ export default function ProductDetail() {
             ฿{product.price.toLocaleString()}
           </p>
 
-          <p className="mb-8 text-gray-600 leading-relaxed text-lg">{product.desc}</p>
+          <p className="mb-8 text-gray-600 leading-relaxed text-lg">{product.description}</p>
 
           {/* 2. ส่วนเลือกจำนวน (Quantity Selector) */}
           <div className="mb-8">
             <p className="text-gray-500 mb-3 font-medium">จำนวน</p>
             <div className="flex items-center gap-4">
               <div className="flex items-center border-2 border-gray-300 rounded-2xl bg-white overflow-hidden w-fit">
-                <button 
+                <button
                   onClick={decrement}
                   className="px-5 py-2 hover:bg-gray-100 transition active:bg-gray-200 font-bold text-xl"
                 >
@@ -89,7 +125,7 @@ export default function ProductDetail() {
                 <div className="px-6 py-2 font-semibold text-lg border-x-2 border-gray-100 min-w-[60px] text-center">
                   {quantity}
                 </div>
-                <button 
+                <button
                   onClick={increment}
                   className="px-5 py-2 hover:bg-gray-100 transition active:bg-gray-200 font-bold text-xl text-[#f28c45]"
                 >
