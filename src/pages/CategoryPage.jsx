@@ -42,13 +42,13 @@ export default function CategoryPage() {
   // ================= FETCH =================
   useEffect(() => {
     axios.get(
-  `http://localhost:5000/api/my-products/${slug}`,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  }
-)
+      `http://localhost:5000/api/my-products/${slug}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
       .then(res => {
         setProducts(res.data);
         setSelectedItems([]);
@@ -112,16 +112,16 @@ export default function CategoryPage() {
         try {
           if (isEdit) {
             await axios.put(
-            `http://localhost:5000/api/product/${editingId}`,
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`
+              `http://localhost:5000/api/product/${editingId}`,
+              formData,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`
+                }
               }
-            }
-          );
+            );
           } else {
-            
+
 
             await axios.post(
               "http://localhost:5000/api/product",
@@ -168,14 +168,14 @@ export default function CategoryPage() {
     showAlert("แน่ใจหรือไม่ว่าต้องการลบ?", async () => {
       await Promise.all(
         selectedItems.map(id =>
-         axios.delete(
-          `http://localhost:5000/api/product/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
+          axios.delete(
+            `http://localhost:5000/api/product/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
             }
-          }
-        )
+          )
         )
       );
 
@@ -271,117 +271,124 @@ export default function CategoryPage() {
       </div>
 
       {/* MODAL */}
-    {showModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-    <div className="bg-white w-[820px] rounded-2xl p-8">
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
+          <div className="bg-white w-[800px] rounded-2xl p-8 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl text-center font-semibold mb-8 relative">
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  setIsEdit(false);
+                  setEditingId(null);
+                }}
+                className="absolute top-0 right-0 text-gray-400 hover:text-black text-2xl font-bold"
+              >
+                X
+              </button>
+              {isEdit ? "แก้ไขสินค้า" : "เพิ่มสินค้า"}
+            </h2>
 
-      <h2 className="text-xl text-center font-semibold mb-8">
-        {isEdit ? "แก้ไขสินค้า" : "เพิ่มสินค้า"}
-      </h2>
+            {/* ===== TOP SECTION ===== */}
+            <div className="grid grid-cols-2 gap-8 mb-8">
 
-      {/* ===== TOP SECTION ===== */}
-      <div className="grid grid-cols-2 gap-8 mb-8">
+              {/* รูปใหญ่ */}
+              <label className="h-[220px] bg-gray-200 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden">
+                {formData.previews[0]
+                  ? <img src={formData.previews[0]} className="w-full h-full object-cover" />
+                  : <span className="text-gray-500">เลือกรูปหลัก</span>}
+                <input type="file" hidden
+                  accept="image/*"
+                  onChange={(e) => handleImageChange(e, 0)} />
+              </label>
 
-        {/* รูปใหญ่ */}
-        <label className="h-[260px] bg-gray-200 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden">
-          {formData.previews[0]
-            ? <img src={formData.previews[0]} className="w-full h-full object-cover"/>
-            : <span className="text-gray-500">เลือกรูปหลัก</span>}
-          <input type="file" hidden
-            accept="image/*"
-            onChange={(e)=>handleImageChange(e,0)}/>
-        </label>
+              {/* รูปเล็ก 3 รูป */}
+              <div className="flex flex-col gap-3">
+                {[1, 2, 3].map(i => (
+                  <label key={i}
+                    className="h-[75px] bg-gray-200 rounded-xl flex items-center justify-center cursor-pointer overflow-hidden">
+                    {formData.previews[i]
+                      ? <img src={formData.previews[i]} className="w-full h-full object-cover" />
+                      : <span className="text-sm text-gray-500">เลือกรูป</span>}
+                    <input type="file" hidden
+                      accept="image/*"
+                      onChange={(e) => handleImageChange(e, i)} />
+                  </label>
+                ))}
+              </div>
+            </div>
 
-        {/* รูปเล็ก 3 รูป */}
-        <div className="flex flex-col gap-3">
-          {[1,2,3].map(i => (
-            <label key={i}
-              className="h-[75px] bg-gray-200 rounded-xl flex items-center justify-center cursor-pointer overflow-hidden">
-              {formData.previews[i]
-                ? <img src={formData.previews[i]} className="w-full h-full object-cover"/>
-                : <span className="text-sm text-gray-500">เลือกรูป</span>}
-              <input type="file" hidden
-                accept="image/*"
-                onChange={(e)=>handleImageChange(e,i)}/>
-            </label>
-          ))}
-        </div>
-      </div>
+            {/* ===== FORM ===== */}
+            <div className="space-y-4 mb-8">
 
-      {/* ===== FORM ===== */}
-      <div className="space-y-4 mb-8">
+              <input
+                className="w-full p-3 border rounded-lg"
+                placeholder="ชื่อสินค้า"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
 
-        <input
-          className="w-full p-3 border rounded-lg"
-          placeholder="ชื่อสินค้า"
-          value={formData.name}
-          onChange={(e)=>setFormData({...formData,name:e.target.value})}
-        />
+              <input
+                className="w-full p-3 border rounded-lg"
+                placeholder="ศิลปิน"
+                value={formData.artist}
+                onChange={(e) => setFormData({ ...formData, artist: e.target.value })}
+              />
 
-        <input
-          className="w-full p-3 border rounded-lg"
-          placeholder="ศิลปิน"
-          value={formData.artist}
-          onChange={(e)=>setFormData({...formData,artist:e.target.value})}
-        />
-
-        {/* 🔥 ราคา (ไม่มีลูกศรแล้ว) */}
-        <input
-          type="number"
-          placeholder="ราคา"
-          value={formData.price}
-          onChange={(e)=>setFormData({...formData,price:e.target.value})}
-          className="w-full p-3 border rounded-lg appearance-none
+              {/* 🔥 ราคา (ไม่มีลูกศรแล้ว) */}
+              <input
+                placeholder="ราคา"
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                className="w-full p-3 border rounded-lg appearance-none
                      [&::-webkit-outer-spin-button]:appearance-none
                      [&::-webkit-inner-spin-button]:appearance-none"
-        />
+              />
 
-        <textarea
-          className="w-full p-3 border rounded-lg h-24 resize-none"
-          placeholder="รายละเอียด"
-          value={formData.description}
-          onChange={(e)=>setFormData({...formData,description:e.target.value})}
-        />
+              <textarea
+                className="w-full p-3 border rounded-lg h-24 resize-none"
+                placeholder="รายละเอียด"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
 
-        {/* หมวดหมู่ */}
-        <div>
-          <p className="mb-2 text-sm font-medium">หมวดหมู่สินค้า</p>
-          <div className="grid grid-cols-3 gap-3">
-            {categories.map(cat => (
+              {/* หมวดหมู่ */}
+              <div>
+                <p className="mb-2 text-sm font-medium">หมวดหมู่สินค้า</p>
+                <div className="grid grid-cols-3 gap-3">
+                  {categories.map(cat => (
+                    <button
+                      key={cat.slug}
+                      type="button"
+                      onClick={() =>
+                        setFormData({ ...formData, category: cat.slug })
+                      }
+                      className={`p-2 rounded-lg text-sm border transition
+                  ${formData.category === cat.slug
+                          ? "bg-[#f28c45] text-white border-[#f28c45]"
+                          : "bg-gray-100 hover:bg-gray-200"
+                        }`}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+
+            {/* ===== BUTTON ===== */}
+            <div className="text-center">
               <button
-                key={cat.slug}
-                type="button"
-                onClick={() =>
-                  setFormData({ ...formData, category: cat.slug })
-                }
-                className={`p-2 rounded-lg text-sm border transition
-                  ${
-                    formData.category === cat.slug
-                      ? "bg-[#f28c45] text-white border-[#f28c45]"
-                      : "bg-gray-100 hover:bg-gray-200"
-                  }`}
+                onClick={handleSubmit}
+                className="bg-[#f28c45] text-white px-10 py-2.5 rounded-lg hover:scale-105 transition"
               >
-                {cat.name}
+                {isEdit ? "บันทึกการแก้ไข" : "เพิ่มสินค้า"}
               </button>
-            ))}
+            </div>
+
           </div>
         </div>
-
-      </div>
-
-      {/* ===== BUTTON ===== */}
-      <div className="text-center">
-        <button
-          onClick={handleSubmit}
-          className="bg-[#f28c45] text-white px-10 py-2.5 rounded-lg hover:scale-105 transition"
-        >
-          {isEdit ? "บันทึกการแก้ไข" : "เพิ่มสินค้า"}
-        </button>
-      </div>
-
-    </div>
-  </div>
-)}
+      )}
 
       {/* ALERT MODAL */}
       {alertData.show && (

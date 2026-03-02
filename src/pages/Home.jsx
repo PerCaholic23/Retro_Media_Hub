@@ -157,7 +157,7 @@ function SmallCircle({ text, className, image }) {
   return (
     <div 
       onClick={() => navigate(`/home?category=${text}`)} 
-      className={`absolute flex flex-col items-center cursor-pointer hover:scale-110 transition active:scale-95 ${className}`}
+      className={`absolute flex flex-col items-center cursor-pointer hover:scale-200 transition active:scale-95 ${className}`}
     >
       <div className="w-[150px] h-[150px] rounded-full bg-white shadow-md flex items-center justify-center overflow-hidden border-2 border-gray-100 relative">
         {image ? (

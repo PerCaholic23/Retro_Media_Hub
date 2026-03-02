@@ -125,7 +125,7 @@ export default function Navbar() {
             <img
               src={CartIcon}
               alt="cart"
-              className="w-8 h-8"
+              className="w-10 h-10"
             />
           </button>
 

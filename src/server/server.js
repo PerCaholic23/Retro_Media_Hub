@@ -9,8 +9,8 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 // Models test
-const User = require("../models/user");
-const Product = require("../models/product");
+const User = require("../../src/models/user");
+const Product = require("../../src/models/product");
 
 const app = express();
 
