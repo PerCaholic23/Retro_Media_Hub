@@ -33,6 +33,10 @@ export default function Checkout() {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
 
         const res = await fetch("http://localhost:5000/api/auth/me", {
           headers: {
@@ -41,7 +45,9 @@ export default function Checkout() {
         });
 
         const data = await res.json();
-        setAddress(data);
+        if (res.ok) {
+          setAddress(data);
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -50,7 +56,7 @@ export default function Checkout() {
     };
 
     fetchUser();
-  }, []);
+  }, [navigate]);
 
   /* ================= HANDLE ORDER ================= */
   const handleOrder = () => {
@@ -87,15 +93,15 @@ export default function Checkout() {
                 <p className="text-gray-500 text-sm">{item.artist}</p>
               </div>
             </div>
-            <p className="font-semibold">
-              ฿{item.price * (item.quantity || 1)}
+            <p className="font-semibold text-lg">
+              ฿{(item.price * (item.quantity || 1)).toLocaleString()}
             </p>
           </div>
         ))}
       </div>
 
-      {/* ================= ที่อยู่ ================= */}
-      <div className="bg-white rounded-3xl p-6 shadow-md">
+      {/* ================= ที่อยู่ (เพิ่ม Soy เข้าไปแล้ว) ================= */}
+      <div className="bg-white rounded-3xl p-6 shadow-md border-l-8 border-orange-400">
         <h2 className="font-semibold mb-4 text-lg text-orange-500">
           📍 ที่อยู่ในการจัดส่ง
         </h2>
@@ -104,11 +110,14 @@ export default function Checkout() {
           <p>กำลังโหลดข้อมูล...</p>
         ) : address ? (
           <>
-            <p className="font-medium">
+            <p className="font-medium text-lg">
               {address.fullName} {address.phone}
             </p>
-            <p className="text-gray-500">
-              {address.house} {address.road} {address.subdistrict}{" "}
+            <p className="text-gray-500 leading-relaxed">
+              {address.address} 
+              {/* ตรวจสอบว่ามีข้อมูลซอย และข้อมูลไม่เป็นเครื่องหมายขีด หรือค่าว่าง */}
+              {address.soy && address.soy !== "-" && ` ${address.soy}`} 
+              {address.street && address.street !== "-" && ` ${address.street}`} <br />
               {address.district} {address.province} {address.postalCode}
             </p>
           </>
@@ -126,10 +135,10 @@ export default function Checkout() {
         <div className="flex gap-4">
           <button
             onClick={() => setPaymentMethod("qr")}
-            className={`px-6 py-3 rounded-xl border transition ${
+            className={`px-6 py-3 rounded-xl border transition font-medium ${
               paymentMethod === "qr"
-                ? "bg-orange-400 text-white"
-                : "bg-white"
+                ? "bg-orange-400 text-white border-orange-400"
+                : "bg-white border-gray-200"
             }`}
           >
             QR พร้อมเพย์
@@ -137,10 +146,10 @@ export default function Checkout() {
 
           <button
             onClick={() => setPaymentMethod("cod")}
-            className={`px-6 py-3 rounded-xl border transition ${
+            className={`px-6 py-3 rounded-xl border transition font-medium ${
               paymentMethod === "cod"
-                ? "bg-orange-400 text-white"
-                : "bg-white"
+                ? "bg-orange-400 text-white border-orange-400"
+                : "bg-white border-gray-200"
             }`}
           >
             เก็บเงินปลายทาง
@@ -149,18 +158,18 @@ export default function Checkout() {
       </div>
 
       {/* ================= Sticky Bottom ================= */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg px-24 py-5 flex justify-between items-center">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg px-24 py-5 flex justify-between items-center z-10">
         <div className="space-y-1 text-gray-600">
-          <p>รวมสินค้า: ฿{subtotal}</p>
+          <p>รวมสินค้า: ฿{subtotal.toLocaleString()}</p>
           <p>ค่าจัดส่ง: ฿{shippingFee}</p>
-          <p className="text-lg font-bold text-orange-500">
-            ยอดรวม: ฿{total}
+          <p className="text-xl font-bold text-orange-500">
+            ยอดรวม: ฿{total.toLocaleString()}
           </p>
         </div>
 
         <button
           onClick={handleOrder}
-          className="bg-[#f28c45] text-white px-10 py-4 rounded-2xl hover:scale-105 transition"
+          className="bg-[#f28c45] text-white px-10 py-4 rounded-2xl hover:scale-105 transition font-bold"
         >
           สั่งสินค้า
         </button>
@@ -170,7 +179,6 @@ export default function Checkout() {
       {showQRModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-white w-[420px] p-8 rounded-3xl relative text-center">
-
             <button
               onClick={() => {
                 setShowQRModal(false);
@@ -180,19 +188,15 @@ export default function Checkout() {
             >
               ✕
             </button>
-
             <h2 className="text-xl font-semibold mb-6 text-orange-500">
               กรุณาชำระเงินผ่าน QR พร้อมเพย์
             </h2>
-
             <div className="w-64 h-64 bg-gray-300 mx-auto rounded-2xl flex items-center justify-center text-gray-500 text-lg shadow-inner">
               QR IMAGE
             </div>
-
             <p className="mt-6 text-gray-600">
-              สแกนเพื่อชำระเงิน ฿{total}
+              สแกนเพื่อชำระเงิน ฿{total.toLocaleString()}
             </p>
-
           </div>
         </div>
       )}
@@ -201,15 +205,12 @@ export default function Checkout() {
       {showSuccessModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white w-[400px] p-8 rounded-3xl text-center shadow-xl">
-
             <h2 className="text-2xl font-semibold text-green-500 mb-4">
               สั่งซื้อเสร็จสิ้น
             </h2>
-
             <p className="text-gray-600 mb-6">
               ระบบได้รับคำสั่งซื้อเรียบร้อยแล้ว
             </p>
-
             <button
               onClick={() => {
                 setShowSuccessModal(false);
@@ -219,7 +220,6 @@ export default function Checkout() {
             >
               กลับหน้าแรก
             </button>
-
           </div>
         </div>
       )}

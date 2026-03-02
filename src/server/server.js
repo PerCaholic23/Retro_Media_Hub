@@ -39,7 +39,8 @@ app.post("/api/register", async (req, res) => {
       street,
       province,
       district,
-      postalCode
+      postalCode,
+      soy
     } = req.body;
 
     const existing = await User.findOne({ email });
@@ -59,7 +60,8 @@ app.post("/api/register", async (req, res) => {
       street,
       province,
       district,
-      postalCode
+      postalCode,
+      soy
     });
 
     await user.save();
@@ -153,6 +155,25 @@ const authMiddleware = (req, res, next) => {
     return res.status(401).json({ message: "Invalid token" });
   }
 };
+
+/* =================================================
+   GET CURRENT USER (สำหรับ Checkout)
+================================================= */
+app.get("/api/auth/me", authMiddleware, async (req, res) => {
+  try {
+    // ดึงข้อมูล user จาก ID ที่แกะได้จาก Token (req.user.id)
+    const user = await User.findById(req.user.id).select("-password");
+    
+    if (!user) {
+      return res.status(404).json({ message: "ไม่พบข้อมูลผู้ใช้" });
+    }
+
+    // ส่งข้อมูลกลับไปในรูปแบบที่ Frontend เข้าใจ
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 /* =================================================
    PRODUCT SECTION

@@ -12,6 +12,8 @@ const userSchema = new mongoose.Schema({
   province: { type: String, required: true },
   district: { type: String, required: true },
   postalCode: { type: String, required: true },
+  soy: { type: String, required: true },
+
 
   promptpayQR: { type: String, default: "" },
 }, { timestamps: true });

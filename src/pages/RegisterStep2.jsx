@@ -91,6 +91,13 @@ function RegisterStep2() {
           />
 
           <input
+            name="soy"
+            placeholder="หมู่ / ซอย"
+            onChange={handleChange}
+            className={inputStyle}
+          />
+
+          <input
             name="street"
             placeholder="ถนน / ตำบล"
             onChange={handleChange}
