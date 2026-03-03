@@ -128,35 +128,57 @@ export default function Home() {
           </div>
 
           <div className="relative w-[650px] h-[650px]">
-            <div
-              onClick={() => navigate("/home?category=CD เพลง")}
-              className="absolute top-[160px] left-[0px] w-[360px] h-[360px] rounded-full bg-white z-20 shadow-xl flex items-center justify-center overflow-hidden cursor-pointer hover:scale-105 transition border-4 border-white"
-            >
-              <img src="https://i.pinimg.com/736x/25/67/32/256732cfc95f431a70ee49de12c328a1.jpg" alt="CD" className="w-full h-full object-cover" />
-              <span className="absolute bottom-6 bg-white px-5 py-2 rounded-xl shadow text-black font-bold">CD เพลง</span>
-            </div>
+  {/* ตัวอย่าง: CD เพลง (อันใหญ่กลาง) - ผมปรับให้ข้อความอยู่ล่างสุดแบบไม่ทับรูปมาก */}
+  <div
+  onClick={() => navigate("/home?category=CD เพลง")}
+  /* 1. เอา overflow-hidden ออกจากบรรทัดนี้ */
+  className="absolute top-[160px] left-[0px] w-[360px] h-[360px] rounded-full bg-white z-20 shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition border-4 border-white"
+>
+  {/* 2. ใส่ rounded-full และ overflow-hidden ที่ img แทนเพื่อให้รูปยังเป็นวงกลม */}
+  <img 
+    src="https://i.pinimg.com/736x/25/67/32/256732cfc95f431a70ee49de12c328a1.jpg" 
+    alt="CD" 
+    className="w-full h-full object-cover rounded-full overflow-hidden" 
+  />
 
-            <SmallCircle
-              text="แผ่นเสียง"
-              image="https://i.pinimg.com/736x/4b/c8/6d/4bc86d00722fd941baededbae9411845.jpg"
-              className="top-[-10px] left-[200px] z-10"
-            />
-            <SmallCircle
-              text="เทปคาสเซ็ท"
-              image="https://i.pinimg.com/1200x/00/00/99/000099d11fdec13320997e182e968f5f.jpg"
-              className="top-[100px] left-[340px] z-10"
-            />
-            <SmallCircle
-              text="โปสเตอร์ศิลปิน"
-              image="https://i.pinimg.com/736x/6e/0a/2b/6e0a2b2826c82a28084348e7a0004bbb.jpg"
-              className="bottom-[220px] left-[390px] z-10"
-            />
-            <SmallCircle
-              text="เสื้อวง"
-              image="https://i.pinimg.com/736x/01/03/4d/01034d08a5985dd64c0af29afda50ca6.jpg"
-              className="bottom-[45px] left-[330px] z-10"
-            />
-          </div>
+  {/* 3. ตอนนี้ขยับ left, bottom ได้อิสระแล้ว จะหลุดนอกวงกลมแค่ไหนก็ได้ */}
+  <span className="absolute top-[45px] left-[-20px] bg-white px-5 py-2 rounded-xl shadow-lg text-black font-bold z-30">
+    CD เพลง
+  </span>
+</div>
+
+  {/* แผ่นเสียง: ให้ข้อความอยู่ "ข้างบน" วงกลม */}
+  <SmallCircle
+    text="แผ่นเสียง"
+    image="https://i.pinimg.com/736x/4b/c8/6d/4bc86d00722fd941baededbae9411845.jpg"
+    className="top-[-10px] left-[200px]"
+    textPosition="bottom-[100px] left-[100px]" 
+  />
+
+  {/* เทปคาสเซ็ท: ให้ข้อความอยู่ "ทางขวา" ของวงกลม */}
+  <SmallCircle
+    text="เทปคาสเซ็ท"
+    image="https://i.pinimg.com/1200x/00/00/99/000099d11fdec13320997e182e968f5f.jpg"
+    className="top-[100px] left-[340px]"
+    textPosition="right-[-40px] top-[20px]" 
+  />
+
+  {/* โปสเตอร์ศิลปิน: ให้ข้อความอยู่ "ข้างล่าง" (เหมือนเดิมแต่ขยับได้) */}
+  <SmallCircle
+    text="โปสเตอร์ศิลปิน"
+    image="https://i.pinimg.com/736x/6e/0a/2b/6e0a2b2826c82a28084348e7a0004bbb.jpg"
+    className="bottom-[220px] left-[390px]"
+    textPosition="bottom-[100px] left-[80px]"
+  />
+
+  {/* เสื้อวง: ให้ข้อความอยู่ "ทางซ้าย" ของวงกลม */}
+  <SmallCircle
+    text="เสื้อวง"
+    image="https://i.pinimg.com/736x/01/03/4d/01034d08a5985dd64c0af29afda50ca6.jpg"
+    className="bottom-[45px] left-[330px]"
+    textPosition="bottom-[100px] left-[100px]"
+  />
+</div>
         </div>
       )}
 
@@ -208,12 +230,12 @@ export default function Home() {
   );
 }
 
-function SmallCircle({ text, className, image }) {
+function SmallCircle({ text, className, image, textPosition = "bottom-[-20px]" }) {
   const navigate = useNavigate();
   return (
     <div
       onClick={() => navigate(`/home?category=${text}`)}
-      className={`absolute flex flex-col items-center cursor-pointer hover:scale-200 transition active:scale-95 ${className}`}
+      className={`absolute flex flex-col items-center cursor-pointer hover:scale-110 transition active:scale-95 z-10 ${className}`}
     >
       <div className="w-[150px] h-[150px] rounded-full bg-white shadow-md flex items-center justify-center overflow-hidden border-2 border-gray-100 relative">
         {image ? (
@@ -222,7 +244,9 @@ function SmallCircle({ text, className, image }) {
           <span className="text-gray-400 text-xs">No Image</span>
         )}
       </div>
-      <span className="mt-[-20px] z-30 bg-white px-4 py-1 rounded-xl shadow-md text-sm text-black whitespace-nowrap border border-gray-100 font-medium">
+      
+      {/* ใช้ absolute เพื่อให้ข้อความขยับได้อิสระรอบวงกลม */}
+      <span className={`absolute bg-white px-4 py-1 rounded-xl shadow-md text-sm text-black whitespace-nowrap border border-gray-100 font-medium z-30 ${textPosition}`}>
         {text}
       </span>
     </div>
