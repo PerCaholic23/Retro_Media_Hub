@@ -315,6 +315,23 @@ app.get("/api/products", authMiddleware, async (req, res) => {
   }
 });
 
+// ดึงสินค้า 1 ชิ้นตาม ID
+app.get("/api/product/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id)
+      .populate("owner", "username");
+
+    if (!product) {
+      return res.status(404).json({ message: "ไม่พบสินค้า" });
+    }
+
+    res.json(product);
+
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 /* ================================================= */
 
 app.listen(5000, () => {
