@@ -106,9 +106,9 @@ export default function Home() {
                   className="flex gap-4 bg-[#eef3f7] p-4 rounded-2xl mb-4 cursor-pointer hover:scale-[1.02] transition"
                 >
                   <div className="w-14 h-14 rounded-xl overflow-hidden">
-                    {item.image ? (
+                    {item.images?.[0] ? (
                       <img
-                        src={item.image}
+                        src={item.images[0]}
                         alt={item.name}
                         className="w-full h-full object-cover"
                       />
@@ -203,9 +203,9 @@ export default function Home() {
                     className="bg-white p-6 rounded-3xl shadow-md hover:shadow-xl hover:scale-105 cursor-pointer transition"
                   >
                     <div className="w-full h-40 rounded-2xl overflow-hidden mb-4">
-                      {item.image ? (
+                      {item.images?.[0] ? (
                         <img
-                          src={item.image}
+                          src={item.images[0]}
                           alt={item.name}
                           className="w-full h-full object-cover"
                         />

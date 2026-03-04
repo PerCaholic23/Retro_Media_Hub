@@ -28,7 +28,6 @@ export default function CategoryPage() {
     category: slug,
     price: "",
     stock: "1",
-    image: "",
     previews: ["", "", "", ""],
   });
 
@@ -62,11 +61,11 @@ export default function CategoryPage() {
     axios.get(`http://localhost:5000/api/my-products/${slug}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
-    .then(res => {
-      setProducts(res.data);
-      setSelectedItems([]);
-      setSelectAll(false);
-    });
+      .then(res => {
+        setProducts(res.data);
+        setSelectedItems([]);
+        setSelectAll(false);
+      });
   }, [slug]);
 
   const handleSelectItem = (id) => {
@@ -98,7 +97,11 @@ export default function CategoryPage() {
     reader.onloadend = () => {
       const updated = [...formData.previews];
       updated[index] = reader.result;
-      setFormData(prev => ({ ...prev, image: updated[0], previews: updated }));
+
+      setFormData(prev => ({
+        ...prev,
+        previews: updated
+      }));
     };
     reader.readAsDataURL(file);
   };
@@ -110,13 +113,37 @@ export default function CategoryPage() {
     showAlert(isEdit ? "ยืนยันแก้ไขสินค้า?" : "ยืนยันเพิ่มสินค้า?", async () => {
       try {
         if (isEdit) {
-          await axios.put(`http://localhost:5000/api/product/${editingId}`, formData, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+          await axios.put(
+  `http://localhost:5000/api/product/${editingId}`,
+  {
+    name: formData.name,
+    artist: formData.artist,
+    description: formData.description,
+    category: formData.category,
+    price: formData.price,
+    stock: formData.stock,
+    images: formData.previews
+  },
+  {
+    headers: { Authorization: `Bearer ${token}` }
+  }
+);
         } else {
-          await axios.post("http://localhost:5000/api/product", formData, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+          await axios.post(
+  "http://localhost:5000/api/product",
+  {
+    name: formData.name,
+    artist: formData.artist,
+    description: formData.description,
+    category: formData.category,
+    price: formData.price,
+    stock: formData.stock,
+    images: formData.previews   // 👈 THIS IS THE KEY
+  },
+  {
+    headers: { Authorization: `Bearer ${token}` }
+  }
+);
         }
         const res = await axios.get(`http://localhost:5000/api/my-products/${slug}`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -145,10 +172,16 @@ export default function CategoryPage() {
     setIsEdit(true);
     setEditingId(item._id);
     setFormData({
-      name: item.name, artist: item.artist, description: item.description,
-      category: item.category, price: item.price, stock: item.stock || "1",
-      image: item.image, previews: [item.image, "", "", ""],
-    });
+  name: item.name,
+  artist: item.artist,
+  description: item.description,
+  category: item.category,
+  price: item.price,
+  stock: item.stock || "1",
+  previews: item.images?.length
+    ? [...item.images, "", "", "", ""].slice(0, 4)
+    : ["", "", "", ""],
+});
     setShowModal(true);
   };
 
@@ -159,7 +192,7 @@ export default function CategoryPage() {
           <div key={item._id} className="bg-white rounded-2xl p-6 flex justify-between shadow-sm">
             <div className="flex gap-6 items-center">
               <input type="checkbox" className="w-6 h-6 accent-[#f28c45]" checked={selectedItems.includes(item._id)} onChange={() => handleSelectItem(item._id)} />
-              <img src={item.image} className="w-24 h-24 object-cover rounded-lg" />
+              <img src={item.images?.[0]} className="w-24 h-24 object-cover rounded-lg" />
               <div>
                 <h3 className="font-semibold">{item.name}</h3>
                 <p className="text-gray-500">{item.artist}</p>
@@ -180,7 +213,7 @@ export default function CategoryPage() {
         <div className="flex gap-4 items-center">
           <input type="checkbox" className="w-6 h-6 accent-[#f28c45]" checked={selectAll} onChange={handleSelectAll} />
           <span>เลือกทั้งหมด</span>
-          <button 
+          <button
             onClick={handleDeleteProducts}
             className={`font-semibold ${selectedItems.length > 0 ? "text-red-500" : "text-gray-400"}`}
           >
@@ -239,32 +272,32 @@ export default function CategoryPage() {
               <input className="w-full p-3 border rounded-lg" placeholder="ชื่อสินค้า" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
               <input className="w-full p-3 border rounded-lg" placeholder="ศิลปิน" value={formData.artist} onChange={(e) => setFormData({ ...formData, artist: e.target.value })} />
               <textarea className="w-full p-3 border rounded-lg h-24 resize-none" placeholder="รายละเอียด" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
-             <div className="grid grid-cols-2 gap-4">
-  {/* ช่องราคา: ไม่มีปุ่มเพิ่มลด */}
-  <div>
-    <p className="mb-2 text-sm font-medium">ราคา (฿)</p>
-    <input 
-      type="number" 
-      value={formData.price} 
-      onChange={(e) => setFormData({ ...formData, price: e.target.value })} 
-      className="w-full p-3 border rounded-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
-      placeholder="0"
-    />
-  </div>
+              <div className="grid grid-cols-2 gap-4">
+                {/* ช่องราคา: ไม่มีปุ่มเพิ่มลด */}
+                <div>
+                  <p className="mb-2 text-sm font-medium">ราคา (฿)</p>
+                  <input
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    className="w-full p-3 border rounded-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    placeholder="0"
+                  />
+                </div>
 
-  {/* ช่องจำนวน (Stock): มีปุ่มเพิ่มลดปกติ */}
-  <div>
-    <p className="mb-2 text-sm font-medium">จำนวนในคลัง (Stock)</p>
-    <input 
-      type="number" 
-      value={formData.stock} 
-      onChange={(e) => setFormData({ ...formData, stock: e.target.value })} 
-      className="w-full p-3 border rounded-lg" // ใช้คลาสปกติ ปุ่มเพิ่มลดจะปรากฏตาม Browser
-      placeholder="0"
-      min="0"
-    />
-  </div>
-</div>
+                {/* ช่องจำนวน (Stock): มีปุ่มเพิ่มลดปกติ */}
+                <div>
+                  <p className="mb-2 text-sm font-medium">จำนวนในคลัง (Stock)</p>
+                  <input
+                    type="number"
+                    value={formData.stock}
+                    onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                    className="w-full p-3 border rounded-lg" // ใช้คลาสปกติ ปุ่มเพิ่มลดจะปรากฏตาม Browser
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+              </div>
               <div>
                 <p className="mb-2 text-sm font-medium">หมวดหมู่สินค้า</p>
                 <div className="grid grid-cols-3 gap-3">

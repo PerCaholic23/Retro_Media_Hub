@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -10,6 +11,7 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentImage, setCurrentImage] = useState(0);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -30,6 +32,22 @@ export default function ProductDetail() {
     };
     fetchProduct();
   }, [id]);
+
+  const nextImage = () => {
+    if (!product?.images?.length) return;
+
+    setCurrentImage((prev) =>
+      prev === product.images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    if (!product?.images?.length) return;
+
+    setCurrentImage((prev) =>
+      prev === 0 ? product.images.length - 1 : prev - 1
+    );
+  };
 
   if (loading) {
     return (
@@ -82,16 +100,52 @@ export default function ProductDetail() {
     <div className="bg-[#e9eff3] font-prompt min-h-screen relative">
       <div className="px-24 py-16 flex gap-16">
         {/* IMAGE */}
-        <div className="w-1/2 h-[450px] bg-white rounded-3xl shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden relative">
-          {product.image ? (
-            <img src={product.image} alt={product.name} className={`w-full h-full object-cover ${isOutOfStock ? "grayscale opacity-50" : ""}`} />
+        <div className="group w-1/2 h-[450px] bg-white rounded-3xl shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden relative">
+
+          {product.images && product.images.length > 0 ? (
+            <AnimatePresence mode="wait">
+  <motion.img
+    key={currentImage}
+    src={product.images[currentImage]}
+    alt={product.name}
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.3 }}
+    className="w-full h-full object-cover"
+  />
+</AnimatePresence>
           ) : (
             <div className="text-gray-400">No Image</div>
           )}
-          {/* ป้ายกำกับสินค้าหมดบนรูป */}
+
+          {/* LEFT ARROW */}
+          {product.images && product.images.length > 1 && (
+            <button
+              onClick={prevImage}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 text-white w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-300
+                         hover:bg-orange-500 hover:scale-110 active:scale-95 opacity-0 group-hover:opacity-100 cursor-pointer"
+            >
+              ‹
+            </button>
+          )}
+
+          {/* RIGHT ARROW */}
+          {product.images && product.images.length > 1 && (
+            <button
+              onClick={nextImage}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 text-white w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-300
+                         hover:bg-orange-500 hover:scale-110 active:scale-95 opacity-0 group-hover:opacity-100 cursor-pointer"
+            >
+              ›
+            </button>
+          )}
+
           {isOutOfStock && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="bg-black/70 text-white px-8 py-3 rounded-full text-2xl font-bold tracking-widest border-2 border-white">สินค้าหมด</span>
+              <span className="bg-black/70 text-white px-8 py-3 rounded-full text-2xl font-bold tracking-widest border-2 border-white">
+                สินค้าหมด
+              </span>
             </div>
           )}
         </div>
@@ -125,7 +179,7 @@ export default function ProductDetail() {
                   +
                 </button>
               </div>
-              
+
               {/* แสดงจำนวนคงเหลือ */}
               <div>
                 {isOutOfStock ? (
@@ -142,11 +196,10 @@ export default function ProductDetail() {
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock}
-              className={`px-10 py-4 rounded-2xl font-bold flex-1 transition duration-300 ${
-                isOutOfStock 
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none" 
+              className={`px-10 py-4 rounded-2xl font-bold flex-1 transition duration-300 ${isOutOfStock
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
                 : "bg-gray-800 text-white hover:bg-gray-700 hover:scale-105 active:scale-95"
-              }`}
+                }`}
             >
               เพิ่มลงตะกร้า
             </button>
@@ -154,11 +207,10 @@ export default function ProductDetail() {
             <button
               onClick={handleBuyNow}
               disabled={isOutOfStock}
-              className={`px-10 py-4 rounded-2xl font-bold flex-1 transition duration-300 shadow-lg ${
-                isOutOfStock 
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none border border-gray-300" 
+              className={`px-10 py-4 rounded-2xl font-bold flex-1 transition duration-300 shadow-lg ${isOutOfStock
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none border border-gray-300"
                 : "bg-orange-500 text-white hover:bg-orange-600 hover:scale-105 active:scale-95 shadow-orange-200"
-              }`}
+                }`}
             >
               สั่งซื้อเลย
             </button>

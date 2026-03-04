@@ -7,8 +7,10 @@ const productSchema = new mongoose.Schema({
   category: String, // cd, vinyl, etc
   price: Number,
   stock: { type: Number, default: 0 },
-  image: String, // for now store image URL or base64
-
+  images: {
+    type: [String],
+    default: []
+  },
   owner: {
   type: mongoose.Schema.Types.ObjectId,
   ref: "User",
