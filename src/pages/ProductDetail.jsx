@@ -102,54 +102,88 @@ export default function ProductDetail() {
     <div className="bg-[#e9eff3] font-prompt min-h-screen relative">
       <div className="px-24 py-16 flex gap-16">
         {/* IMAGE */}
-        <div className="group w-1/2 h-[450px] bg-white rounded-3xl shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden relative">
+        <div className="w-full lg:w-[60%] flex flex-col gap-6">          
+          {/* Main Image Container */}
+          <div className="group w-full h-[550px] bg-white rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden relative">            
+            {/* Layer: Fixed Acrylic Base (แผ่นขาวที่อยู่คงที่ ไม่ต้อง Animate เพื่อลดการกระพริบ) */}
+            <div className="absolute inset-0 bg-white/40 backdrop-blur-md z-0" />
 
-          {product.images && product.images.length > 0 ? (
-            <AnimatePresence mode="wait">
-              <motion.img
-                key={currentImage}
-                src={product.images[currentImage]}
-                alt={product.name}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="w-full h-full object-cover"
-              />
-            </AnimatePresence>
-          ) : (
-            <div className="text-gray-400">No Image</div>
-          )}
+            {product.images && product.images.length > 0 ? (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentImage}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="absolute inset-0 w-full h-full flex items-center justify-center"
+                >
+                  {/* Layer: Background Blur (รูปเบลอที่เปลี่ยนตามรูปจริง) */}
+                  <img 
+                    src={product.images[currentImage]} 
+                    alt="blur background" 
+                    className="absolute inset-0 w-full h-full object-cover blur-md scale-110"
+                  />
+                  
+                  {/* Layer: Main Image (รูปคมชัด) */}
+                  <img
+                    src={product.images[currentImage]}
+                    alt={product.name}
+                    className="relative z-10 w-full h-full object-contain p-8"
+                  />
+                </motion.div>
+              </AnimatePresence>
+            ) : (
+              <div className="text-gray-400 z-10">ไม่มีรูปภาพ</div>
+            )}
 
-          {/* LEFT ARROW */}
-          {product.images && product.images.length > 1 && (
-            <button
-              onClick={prevImage}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 text-white w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-300
-                         hover:bg-orange-500 hover:scale-110 active:scale-95 opacity-0 group-hover:opacity-100 cursor-pointer"
-            >
-              ‹
-            </button>
-          )}
+            {/* Arrows */}
+            {product.images && product.images.length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 text-white w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-300 hover:bg-[#f28c45] opacity-0 group-hover:opacity-100 cursor-pointer z-10"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 text-white w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-300 hover:bg-[#f28c45] opacity-0 group-hover:opacity-100 cursor-pointer z-10"
+                >
+                  ›
+                </button>
+              </>
+            )}
 
-          {/* RIGHT ARROW */}
-          {product.images && product.images.length > 1 && (
-            <button
-              onClick={nextImage}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 text-white w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-300
-                         hover:bg-orange-500 hover:scale-110 active:scale-95 opacity-0 group-hover:opacity-100 cursor-pointer"
-            >
-              ›
-            </button>
-          )}
+            {isOutOfStock && (
+              <div className="absolute inset-0 bg-white/40 flex items-center justify-center">
+                <span className="bg-black/70 text-white px-8 py-3 rounded-full text-2xl font-bold border-2 border-white">
+                  สินค้าหมด
+                </span>
+              </div>
+            )}
+          </div>
 
-          {isOutOfStock && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="bg-black/70 text-white px-8 py-3 rounded-full text-2xl font-bold tracking-widest border-2 border-white">
-                สินค้าหมด
-              </span>
-            </div>
-          )}
+          {/* Thumbnails Section: ปรับให้โชว์รูปทั้งหมดและคลิกเลือกได้ */}
+          <div className="flex gap-4 overflow-x-auto py-2 scrollbar-hide justify-center">
+              {product.images?.map((img, index) => (
+              <div
+                key={index}
+                onClick={() => setCurrentImage(index)}
+                className={`w-24 h-24 min-w-[96px] rounded-xl border-2 cursor-pointer transition-all duration-200 overflow-hidden bg-white flex-shrink-0
+                  ${currentImage === index 
+                    ? "border-[#f28c45] shadow-md scale-105" 
+                    : "border-transparent hover:border-gray-200"
+                  }`}
+              >
+                <img 
+                  src={img} 
+                  alt={`thumbnail-${index}`} 
+                  className="w-full h-full object-cover" 
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* DETAILS */}
