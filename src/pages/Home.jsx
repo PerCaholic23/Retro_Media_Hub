@@ -202,7 +202,7 @@ export default function Home() {
                     onClick={() => navigate(`/product/${item._id}`)}
                     className="bg-white p-6 rounded-3xl shadow-md hover:shadow-xl hover:scale-105 cursor-pointer transition"
                   >
-                    <div className="w-full h-40 rounded-2xl overflow-hidden mb-4">
+                    <div className="w-full h-60 rounded-2xl overflow-hidden mb-4">
                       {item.images?.[0] ? (
                         <img
                           src={item.images[0]}

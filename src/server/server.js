@@ -17,6 +17,7 @@ const app = express();
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
+app.use("/uploads", express.static("uploads"));
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
@@ -333,6 +334,33 @@ app.get("/api/product/:id", async (req, res) => {
 });
 
 /* ================================================= */
+
+app.post("/api/order", authMiddleware, async (req, res) => {
+  try {
+    const { items } = req.body;
+
+    for (const item of items) {
+      const product = await Product.findById(item.id);
+
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      if (product.stock < item.quantity) {
+        return res.status(400).json({ message: "Stock not enough" });
+      }
+
+      product.stock -= item.quantity;
+      await product.save();
+    }
+
+    res.json({ message: "Order successful" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 app.listen(5000, () => {
   console.log("Server running on port 5000");

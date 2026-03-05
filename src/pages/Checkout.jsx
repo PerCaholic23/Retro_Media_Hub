@@ -32,14 +32,15 @@ export default function Checkout() {
 
   /* ================= FETCH USER ================= */
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/login");
-          return;
-        }
-
         const res = await fetch("http://localhost:5000/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -52,6 +53,7 @@ export default function Checkout() {
         setLoading(false);
       }
     };
+
     fetchUser();
   }, [navigate]);
 
@@ -64,15 +66,42 @@ export default function Checkout() {
     setShowConfirmModal(true);
   };
 
-  const processOrder = () => {
-    setShowConfirmModal(false);
+  const processOrder = async () => {
+  setShowConfirmModal(false);
+
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch("http://localhost:5000/api/order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        items: itemsToCheckout,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message || "เกิดข้อผิดพลาด");
+      return;
+    }
+
     if (paymentMethod === "cod") {
       clearCart();
       setShowSuccessModal(true);
     } else {
       setShowQRModal(true);
     }
-  };
+
+  } catch (error) {
+    console.error(error);
+    alert("Server error");
+  }
+};
 
   const handleQRPaymentDone = () => {
     clearCart();
@@ -82,13 +111,19 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen flex flex-col px-24 py-10 pb-40 space-y-8 bg-[#f9f9f9]">
-      
+
       {/* รายการสินค้า */}
       <div className="bg-white rounded-3xl p-6 shadow-md space-y-6">
         {itemsToCheckout.map((item) => (
           <div key={item.id} className="flex items-center justify-between border-b pb-4 last:border-0">
             <div className="flex items-center gap-6">
-              <div className="w-20 h-20 bg-gray-300 rounded-xl flex items-center justify-center text-white font-bold">IMG</div>
+              <div className="w-20 h-20 bg-gray-300 rounded-xl flex items-center justify-center text-white font-bold">
+                <img
+                  src={item.image || "https://via.placeholder.com/80"}
+                  alt={item.name}
+                  className="w-20 h-20 object-cover rounded-xl bg-gray-200"
+                />
+              </div>
               <div>
                 <h3 className="font-medium text-lg">{item.name}</h3>
                 <p className="text-gray-500 text-sm">{item.artist}</p>
@@ -106,8 +141,8 @@ export default function Checkout() {
       <div className="bg-white rounded-3xl p-6 shadow-md border-l-8 border-orange-400 relative">
         <div className="flex justify-between items-start mb-4">
           <h2 className="font-semibold text-lg text-orange-500 italic">📍 ที่อยู่ในการจัดส่ง</h2>
-          
-          
+
+
         </div>
 
         {loading ? (
@@ -119,8 +154,8 @@ export default function Checkout() {
               <p className="font-bold text-lg text-gray-800">
                 {address.fullName} <span className="text-gray-300 font-light mx-2">|</span> {address.phone}
               </p>
-              
-              <button 
+
+              <button
                 onClick={() => navigate("/profile")}
                 className="text-sm font-bold text-gray-400 hover:text-orange-500 transition-colors flex items-center gap-1 border border-gray-200 px-3 py-1.5 rounded-lg hover:border-orange-200 bg-white"
               >
@@ -130,7 +165,7 @@ export default function Checkout() {
                 </svg>
               </button>
             </div>
-            
+
             {/* รายละเอียดที่อยู่เรียงแนวนอน */}
             <p className="text-gray-500 text-base leading-relaxed pr-32"> {/* เพิ่ม pr เพื่อไม่ให้ข้อความยาวไปทับปุ่ม */}
               {[
@@ -158,17 +193,15 @@ export default function Checkout() {
         <div className="flex gap-4">
           <button
             onClick={() => setPaymentMethod("qr")}
-            className={`px-6 py-3 rounded-xl border transition font-medium ${
-              paymentMethod === "qr" ? "bg-orange-400 text-white border-orange-400" : "bg-white border-gray-200"
-            }`}
+            className={`px-6 py-3 rounded-xl border transition font-medium ${paymentMethod === "qr" ? "bg-orange-400 text-white border-orange-400" : "bg-white border-gray-200"
+              }`}
           >
             QR พร้อมเพย์
           </button>
           <button
             onClick={() => setPaymentMethod("cod")}
-            className={`px-6 py-3 rounded-xl border transition font-medium ${
-              paymentMethod === "cod" ? "bg-orange-400 text-white border-orange-400" : "bg-white border-gray-200"
-            }`}
+            className={`px-6 py-3 rounded-xl border transition font-medium ${paymentMethod === "cod" ? "bg-orange-400 text-white border-orange-400" : "bg-white border-gray-200"
+              }`}
           >
             เก็บเงินปลายทาง
           </button>
@@ -198,11 +231,11 @@ export default function Checkout() {
       {showConfirmModal && (
         <div className="fixed inset-0 w-screen h-screen z-[9999] flex items-center justify-center pointer-events-auto">
           {/* พื้นหลังเบลอ - ใช้ fixed ทับอีกชั้นเพื่อให้แน่ใจว่าหลุดจากทุก container */}
-          <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-md" 
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-md"
             onClick={() => setShowConfirmModal(false)}
           ></div>
-          
+
           {/* กล่องเนื้อหา */}
           <div className="relative bg-white w-[90%] max-w-[380px] p-8 rounded-[2rem] text-center shadow-2xl z-[10000]">
             <h2 className="text-2xl font-bold mb-4">ยืนยันการสั่งซื้อ</h2>
@@ -219,12 +252,20 @@ export default function Checkout() {
       {showQRModal && (
         <div className="fixed inset-0 w-screen h-screen z-[9999] flex items-center justify-center">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-lg" onClick={() => setShowQRModal(false)}></div>
-          
+
           <div className="relative bg-white w-[90%] max-w-[420px] p-8 rounded-[2.5rem] text-center shadow-2xl z-[10000]">
             <button onClick={() => setShowQRModal(false)} className="absolute top-5 right-6 text-gray-400 text-2xl">✕</button>
             <h2 className="text-xl font-semibold mb-6 text-orange-500 italic">สแกนชำระเงิน</h2>
             <div className="w-60 h-60 bg-gray-100 mx-auto rounded-2xl flex items-center justify-center mb-4 border-2 border-dashed border-gray-200">
-               <span className="text-gray-300">QR CODE</span>
+              {address?.promptpayQR ? (
+                <img
+                  src={address.promptpayQR}
+                  alt="PromptPay QR"
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <span className="text-gray-300">ยังไม่ได้ตั้งค่า QR</span>
+              )}
             </div>
             <p className="text-lg font-bold">ยอดรวม: ฿{total.toLocaleString()}</p>
             <button onClick={handleQRPaymentDone} className="mt-8 w-full bg-green-500 text-white py-4 rounded-xl font-bold shadow-lg shadow-green-100">ชำระเงินเรียบร้อยแล้ว</button>
@@ -236,7 +277,7 @@ export default function Checkout() {
       {showSuccessModal && (
         <div className="fixed inset-0 w-screen h-screen z-[9999] flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-md"></div>
-          
+
           <div className="relative bg-white w-[90%] max-w-[400px] p-10 rounded-[2rem] text-center shadow-2xl z-[10000]">
             <div className="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl font-bold">✓</div>
             <h2 className="text-2xl font-bold text-green-500 mb-2">สั่งซื้อสำเร็จ</h2>

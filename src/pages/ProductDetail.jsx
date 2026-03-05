@@ -74,10 +74,11 @@ export default function ProductDetail() {
   const handleAddToCart = () => {
     if (isOutOfStock) return;
     addToCart({
-      id: product.id,
+      id: product._id,
       name: product.name,
       price: product.price,
       quantity: quantity,
+      image: product.images?.[0],
     });
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2000);
@@ -86,11 +87,12 @@ export default function ProductDetail() {
   const handleBuyNow = () => {
     if (isOutOfStock) return;
     const productData = {
-      id: product.id,
+      id: product._id,
       name: product.name,
       price: product.price,
       quantity: quantity,
       checked: true,
+      image: product.images?.[0],
     };
     addToCart(productData);
     navigate("/checkout", { state: { product: productData } });
@@ -104,17 +106,17 @@ export default function ProductDetail() {
 
           {product.images && product.images.length > 0 ? (
             <AnimatePresence mode="wait">
-  <motion.img
-    key={currentImage}
-    src={product.images[currentImage]}
-    alt={product.name}
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    transition={{ duration: 0.3 }}
-    className="w-full h-full object-cover"
-  />
-</AnimatePresence>
+              <motion.img
+                key={currentImage}
+                src={product.images[currentImage]}
+                alt={product.name}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full h-full object-cover"
+              />
+            </AnimatePresence>
           ) : (
             <div className="text-gray-400">No Image</div>
           )}
