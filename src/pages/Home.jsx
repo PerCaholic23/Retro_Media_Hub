@@ -82,13 +82,35 @@ export default function Home() {
               <h3 className="text-4xl font-regular leading-none ml-52 -mt-30">มือสอง</h3>
             </div>
 
-            <button
+            {/* <button
               onClick={() => navigate("/store")}
               className="mt-8 bg-[#f28c45] text-white px-8 py-3 rounded-2xl shadow-lg hover:scale-105 transition flex items-center gap-3"
             >
               <img src={ShopIcon} alt="store" className="w-7 h-7 object-contain" />
               ร้านค้าของคุณ
-            </button>
+            </button> */}
+            <button
+  onClick={() => navigate("/store")}
+  className="group relative mt-8 bg-[#f28c45] text-white px-10 py-4 rounded-[22px] shadow-[0_10px_25px_rgba(242,140,69,0.3)] hover:shadow-[0_20px_40px_rgba(242,140,69,0.4)] hover:scale-105 transition-all duration-500 flex items-center gap-3 overflow-hidden"
+>
+  {/* เอฟเฟกต์แสงวิ่งผ่าน (Shine Effect) */}
+  <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-all duration-700 group-hover:left-[100%] skew-x-[-25deg]"></div>
+
+  {/* ไอคอนร้านค้า - เพิ่มลูกเล่นการหมุน/กระดก (Wobble) */}
+  <img 
+    src={ShopIcon} 
+    alt="store" 
+    className="w-7 h-7 object-contain transition-transform duration-500 group-hover:rotate-[-12deg] group-hover:scale-110" 
+  />
+
+  {/* ข้อความ - ปรับ font-normal/medium ตามที่คุณชอบ */}
+  <span className="relative text-lg font-medium tracking-wide">
+    ร้านค้าของคุณ
+  </span>
+
+  {/* ลูกเล่นจุดไฟ (Glow) เล็กๆ ที่ขอบปุ่มตอน Hover */}
+  <div className="absolute inset-0 border-2 border-white/20 rounded-[22px] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</button>
 
             <div className="mt-10 bg-[#d6dee4] p-6 rounded-3xl w-[420px] shadow-md">
               <h3 className="font-semibold mb-4 text-lg">รายการสินค้าแนะนำ</h3>
