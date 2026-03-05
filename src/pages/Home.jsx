@@ -6,8 +6,6 @@ import ShopIcon from "../image/ShopIcon.png";
 export default function Home() {
   const navigate = useNavigate();
   const location = useLocation();
-  // ลบหรือคอมเมนต์ user ออกหากไม่ได้ใช้ในขณะนี้ เพื่อเลี่ยง Error no-unused-vars
-  // const [user, setUser] = useState(null); 
 
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get("search") || "";
@@ -18,9 +16,7 @@ export default function Home() {
     if (!token) {
       navigate("/login");
     }
-    // ถ้าจะใช้ setUser ให้ปลดคอมเมนต์บรรทัดด้านบนและด้านล่างนี้
-    // else if (savedUser) { setUser(JSON.parse(savedUser)); }
-  }, [navigate]); // เพิ่ม navigate ตรงนี้
+  }, [navigate]);
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +28,6 @@ export default function Home() {
         setLoading(true);
 
         const query = new URLSearchParams();
-
         if (searchQuery) query.append("search", searchQuery);
         if (categoryQuery) query.append("category", categoryQuery);
 
@@ -47,7 +42,6 @@ export default function Home() {
 
         const data = await res.json();
         setProducts(data);
-
       } catch (err) {
         console.error("Error fetching products:", err);
       } finally {
@@ -58,45 +52,44 @@ export default function Home() {
     fetchProducts();
   }, [searchQuery, categoryQuery]);
 
-
-
   if (!localStorage.getItem("token")) return null;
-  //////////Add loading screen to wait for database to complete
+  
   if (loading) {
     return (
-      <div class="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen">
         <div role="status">
-          <svg aria-hidden="true" class="inline w-10 h-10 w-8 h-8 text-neutral-tertiary animate-spin fill-brand" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg aria-hidden="true" className="inline w-10 h-10 text-neutral-tertiary animate-spin fill-brand" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="white" />
             <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="#f28c45" />
           </svg>
-          <span class="sr-only">Loading...</span>
+          <span className="sr-only">Loading...</span>
         </div>
       </div>
     );
   }
+
   return (
     <div className="bg-[#e9eff3] font-prompt min-h-screen">
       {!searchQuery && !categoryQuery && (
-        <div className="flex justify-between px-24 py-10 relative">
-          <div className="w-1/2 mt-16">
-            <h3 className="font-semibold mb-4 text-4xl">แหล่งรวม</h3>
-            <h1 className="text-6xl font-bold leading-tight ml-20">
-              <span className="text-[#f28c45]">สินค้าด้านดนตรี</span>
-            </h1>
-            <h3 className="text-5xl font-bold leading-tight ml-10">มือสอง</h3>
+        <div className="flex justify-between pl-40 pr-24 py-10 relative">
+          {/* ฝั่งซ้าย: ข้อความและปุ่ม */}
+          <div className="w-1/2 mt-3">
+            <div className="ml-1"> 
+              <h3 className="font-regular ml-40 mb-5  text-3xl">แหล่งรวม</h3>
+              <h1 className="text-5xl font-regular leading-none ml-72 -mt-4">
+                <span className="text-[#f28c45]">สินค้าด้านดนตรี</span>
+              </h1>
+              <h3 className="text-4xl font-regular leading-none ml-52 -mt-30">มือสอง</h3>
+            </div>
 
             <button
               onClick={() => navigate("/store")}
               className="mt-8 bg-[#f28c45] text-white px-8 py-3 rounded-2xl shadow-lg hover:scale-105 transition flex items-center gap-3"
             >
-              <img
-                src={ShopIcon}
-                alt="store"
-                className="w-7 h-7 object-contain"
-              />
+              <img src={ShopIcon} alt="store" className="w-7 h-7 object-contain" />
               ร้านค้าของคุณ
             </button>
+
             <div className="mt-10 bg-[#d6dee4] p-6 rounded-3xl w-[420px] shadow-md">
               <h3 className="font-semibold mb-4 text-lg">รายการสินค้าแนะนำ</h3>
               {products.slice(0, 2).map((item) => (
@@ -107,15 +100,9 @@ export default function Home() {
                 >
                   <div className="w-14 h-14 rounded-xl overflow-hidden">
                     {item.images?.[0] ? (
-                      <img
-                        src={item.images[0]}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={item.images[0]} alt={item.name} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-gray-300 flex items-center justify-center text-xs text-white">
-                        No Img
-                      </div>
+                      <div className="w-full h-full bg-gray-300 flex items-center justify-center text-xs text-white">No Img</div>
                     )}
                   </div>
                   <div>
@@ -127,61 +114,55 @@ export default function Home() {
             </div>
           </div>
 
+          {/* ฝั่งขวา: วงกลมและหมวดหมู่ */}
           <div className="relative w-[650px] h-[650px]">
-  {/* ตัวอย่าง: CD เพลง (อันใหญ่กลาง) - ผมปรับให้ข้อความอยู่ล่างสุดแบบไม่ทับรูปมาก */}
-  <div
-  onClick={() => navigate("/home?category=CD เพลง")}
-  /* 1. เอา overflow-hidden ออกจากบรรทัดนี้ */
-  className="absolute top-[160px] left-[0px] w-[360px] h-[360px] rounded-full bg-white z-20 shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition border-4 border-white"
->
-  {/* 2. ใส่ rounded-full และ overflow-hidden ที่ img แทนเพื่อให้รูปยังเป็นวงกลม */}
-  <img 
-    src="https://i.pinimg.com/736x/25/67/32/256732cfc95f431a70ee49de12c328a1.jpg" 
-    alt="CD" 
-    className="w-full h-full object-cover rounded-full overflow-hidden" 
-  />
+            {/* CD เพลง (อันใหญ่กลาง) */}
+            <div
+              onClick={() => navigate("/home?category=CD เพลง")}
+              className="absolute top-[160px] left-[0px] w-[360px] h-[360px] rounded-full bg-white z-20 shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition border-4 border-white"
+            >
+              <img 
+                src="https://i.pinimg.com/736x/25/67/32/256732cfc95f431a70ee49de12c328a1.jpg" 
+                alt="CD" 
+                className="w-full h-full object-cover rounded-full overflow-hidden" 
+              />
+              <span className="absolute top-[60px] left-[-135px] bg-white px-10 py-4 rounded-2xl shadow-2xl text-black text-2xl font-black z-30 min-w-[250px] text-center">
+                CD เพลง
+              </span>
+            </div>
 
-  {/* 3. ตอนนี้ขยับ left, bottom ได้อิสระแล้ว จะหลุดนอกวงกลมแค่ไหนก็ได้ */}
-  <span className="absolute top-[45px] left-[-20px] bg-white px-5 py-2 rounded-xl shadow-lg text-black font-bold z-30">
-    CD เพลง
-  </span>
-</div>
+            <SmallCircle
+              text="แผ่นเสียง"
+              image="https://i.pinimg.com/736x/4b/c8/6d/4bc86d00722fd941baededbae9411845.jpg"
+              className="top-[-10px] left-[200px]"
+              textPosition="bottom-[100px] left-[100px] text-4xl font-black bg-white px-15 py-3 rounded-full shadow-lg min-w-[140px] text-center" 
+            />
 
-  {/* แผ่นเสียง: ให้ข้อความอยู่ "ข้างบน" วงกลม */}
-  <SmallCircle
-    text="แผ่นเสียง"
-    image="https://i.pinimg.com/736x/4b/c8/6d/4bc86d00722fd941baededbae9411845.jpg"
-    className="top-[-10px] left-[200px]"
-    textPosition="bottom-[100px] left-[100px]" 
-  />
+            <SmallCircle
+              text="เทปคาสเซ็ท"
+              image="https://i.pinimg.com/1200x/00/00/99/000099d11fdec13320997e182e968f5f.jpg"
+              className="top-[100px] left-[350px]"
+              textPosition="right-[-85px] top-[5px] text-4xl font-black bg-white px-15 py-3 rounded-full shadow-lg min-w-[140px] text-center" 
+            />
 
-  {/* เทปคาสเซ็ท: ให้ข้อความอยู่ "ทางขวา" ของวงกลม */}
-  <SmallCircle
-    text="เทปคาสเซ็ท"
-    image="https://i.pinimg.com/1200x/00/00/99/000099d11fdec13320997e182e968f5f.jpg"
-    className="top-[100px] left-[340px]"
-    textPosition="right-[-40px] top-[20px]" 
-  />
+            <SmallCircle
+              text="โปสเตอร์ศิลปิน"
+              image="https://i.pinimg.com/736x/6e/0a/2b/6e0a2b2826c82a28084348e7a0004bbb.jpg"
+              className="bottom-[220px] left-[390px]"
+              textPosition="bottom-[100px] left-[100px] text-4xl font-black bg-white px-15 py-3 rounded-full shadow-lg min-w-[140px] text-center"
+            />
 
-  {/* โปสเตอร์ศิลปิน: ให้ข้อความอยู่ "ข้างล่าง" (เหมือนเดิมแต่ขยับได้) */}
-  <SmallCircle
-    text="โปสเตอร์ศิลปิน"
-    image="https://i.pinimg.com/736x/6e/0a/2b/6e0a2b2826c82a28084348e7a0004bbb.jpg"
-    className="bottom-[220px] left-[390px]"
-    textPosition="bottom-[100px] left-[80px]"
-  />
-
-  {/* เสื้อวง: ให้ข้อความอยู่ "ทางซ้าย" ของวงกลม */}
-  <SmallCircle
-    text="เสื้อวง"
-    image="https://i.pinimg.com/736x/01/03/4d/01034d08a5985dd64c0af29afda50ca6.jpg"
-    className="bottom-[45px] left-[330px]"
-    textPosition="bottom-[100px] left-[100px]"
-  />
-</div>
+            <SmallCircle
+              text="เสื้อวง"
+              image="https://i.pinimg.com/736x/01/03/4d/01034d08a5985dd64c0af29afda50ca6.jpg"
+              className="bottom-[45px] left-[330px]"
+              textPosition="bottom-[100px] left-[100px] text-4xl font-black bg-white px-15 py-3 rounded-full shadow-lg min-w-[140px] text-center"
+            />
+          </div>
         </div>
       )}
 
+      {/* ส่วนแสดงรายการสินค้าเมื่อค้นหาหรือเลือกหมวดหมู่ */}
       <div className="px-24 pb-16">
         {(searchQuery || categoryQuery) && (
           <>
@@ -202,7 +183,7 @@ export default function Home() {
                     onClick={() => navigate(`/product/${item._id}`)}
                     className="bg-white p-6 rounded-3xl shadow-md hover:shadow-xl hover:scale-105 cursor-pointer transition"
                   >
-                    <div className="w-full h-60 rounded-2xl overflow-hidden mb-4">
+                    <div className="w-full h-40 rounded-2xl overflow-hidden mb-4">
                       {item.images?.[0] ? (
                         <img
                           src={item.images[0]}
@@ -244,8 +225,6 @@ function SmallCircle({ text, className, image, textPosition = "bottom-[-20px]" }
           <span className="text-gray-400 text-xs">No Image</span>
         )}
       </div>
-      
-      {/* ใช้ absolute เพื่อให้ข้อความขยับได้อิสระรอบวงกลม */}
       <span className={`absolute bg-white px-4 py-1 rounded-xl shadow-md text-sm text-black whitespace-nowrap border border-gray-100 font-medium z-30 ${textPosition}`}>
         {text}
       </span>
