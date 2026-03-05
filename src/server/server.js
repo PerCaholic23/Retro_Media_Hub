@@ -339,22 +339,38 @@ app.post("/api/order", authMiddleware, async (req, res) => {
   try {
     const { items } = req.body;
 
-    for (const item of items) {
-      const product = await Product.findById(item.id);
-
-      if (!product) {
-        return res.status(404).json({ message: "Product not found" });
-      }
-
-      if (product.stock < item.quantity) {
-        return res.status(400).json({ message: "Stock not enough" });
-      }
-
-      product.stock -= item.quantity;
-      await product.save();
+    if (!items || items.length === 0) {
+      return res.status(400).json({ message: "No items provided" });
     }
 
-    res.json({ message: "Order successful" });
+    // Get first product in checkout
+    const product = await Product.findById(items[0].id)
+      .populate("owner");
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // 🔥 THIS is the seller
+    const seller = product.owner;
+
+    // Reduce stock safely
+    for (const item of items) {
+      const updated = await Product.findOneAndUpdate(
+        { _id: item.id, stock: { $gte: item.quantity } },
+        { $inc: { stock: -item.quantity } },
+        { new: true }
+      );
+
+      if (!updated) {
+        return res.status(400).json({ message: "Stock not enough" });
+      }
+    }
+
+    res.json({
+      message: "Order created",
+      sellerQR: seller.promptpayQR
+    });
 
   } catch (error) {
     console.error(error);

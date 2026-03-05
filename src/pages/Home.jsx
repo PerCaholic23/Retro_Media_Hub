@@ -175,7 +175,7 @@ export default function Home() {
               )}
             </h2>
 
-            <div className="grid grid-cols-3 gap-8">
+            <div className="grid grid-cols-4 gap-8">
               {products.length > 0 ? (
                 products.map((item) => (
                   <div
@@ -183,7 +183,7 @@ export default function Home() {
                     onClick={() => navigate(`/product/${item._id}`)}
                     className="bg-white p-6 rounded-3xl shadow-md hover:shadow-xl hover:scale-105 cursor-pointer transition"
                   >
-                    <div className="w-full h-40 rounded-2xl overflow-hidden mb-4">
+                    <div className="w-full aspect-square rounded-2xl overflow-hidden mb-4">
                       {item.images?.[0] ? (
                         <img
                           src={item.images[0]}
@@ -197,7 +197,14 @@ export default function Home() {
                       )}
                     </div>
                     <h3 className="font-semibold mb-2">{item.name}</h3>
-                    <p className="text-[#f28c45] font-medium">฿{item.price}</p>
+                    <div className = "flex justify-between items-center">
+                      <p className="text-[#d6dee4] font-medium">{item.artist}</p>
+                      <p className="text-[#f28c45] font-semibold">฿{item.price}</p>
+                    
+                      </div>
+
+
+                    
                   </div>
                 ))
               ) : (

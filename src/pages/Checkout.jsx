@@ -17,6 +17,7 @@ export default function Checkout() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [sellerQR, setSellerQR] = useState(null);
 
   const itemsToCheckout = directProduct
     ? [directProduct]
@@ -46,6 +47,7 @@ export default function Checkout() {
         });
 
         const data = await res.json();
+        
         if (res.ok) setAddress(data);
       } catch (error) {
         console.error(error);
@@ -67,41 +69,42 @@ export default function Checkout() {
   };
 
   const processOrder = async () => {
-  setShowConfirmModal(false);
+    setShowConfirmModal(false);
 
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-    const res = await fetch("http://localhost:5000/api/order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        items: itemsToCheckout,
-      }),
-    });
+      const res = await fetch("http://localhost:5000/api/order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          items: itemsToCheckout,
+        }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
+      setSellerQR(data.sellerQR);
 
-    if (!res.ok) {
-      alert(data.message || "เกิดข้อผิดพลาด");
-      return;
+      if (!res.ok) {
+        alert(data.message || "เกิดข้อผิดพลาด");
+        return;
+      }
+
+      if (paymentMethod === "cod") {
+        clearCart();
+        setShowSuccessModal(true);
+      } else {
+        setShowQRModal(true);
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert("Server error");
     }
-
-    if (paymentMethod === "cod") {
-      clearCart();
-      setShowSuccessModal(true);
-    } else {
-      setShowQRModal(true);
-    }
-
-  } catch (error) {
-    console.error(error);
-    alert("Server error");
-  }
-};
+  };
 
   const handleQRPaymentDone = () => {
     clearCart();
@@ -257,14 +260,14 @@ export default function Checkout() {
             <button onClick={() => setShowQRModal(false)} className="absolute top-5 right-6 text-gray-400 text-2xl">✕</button>
             <h2 className="text-xl font-semibold mb-6 text-orange-500 italic">สแกนชำระเงิน</h2>
             <div className="w-60 h-60 bg-gray-100 mx-auto rounded-2xl flex items-center justify-center mb-4 border-2 border-dashed border-gray-200">
-              {address?.promptpayQR ? (
+              {sellerQR ? (
                 <img
-                  src={address.promptpayQR}
-                  alt="PromptPay QR"
+                  src={sellerQR}
+                  alt="Seller PromptPay QR"
                   className="w-full h-full object-contain"
                 />
               ) : (
-                <span className="text-gray-300">ยังไม่ได้ตั้งค่า QR</span>
+                <span className="text-gray-300">ไม่มี QR ของผู้ขาย</span>
               )}
             </div>
             <p className="text-lg font-bold">ยอดรวม: ฿{total.toLocaleString()}</p>

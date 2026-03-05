@@ -34,20 +34,20 @@ export default function ProductDetail() {
   }, [id]);
 
   const nextImage = () => {
-    if (!product?.images?.length) return;
+  if (!cleanImages.length) return;
 
-    setCurrentImage((prev) =>
-      prev === product.images.length - 1 ? 0 : prev + 1
-    );
-  };
+  setCurrentImage(prev =>
+    prev === cleanImages.length - 1 ? 0 : prev + 1
+  );
+};
 
-  const prevImage = () => {
-    if (!product?.images?.length) return;
+const prevImage = () => {
+  if (!cleanImages.length) return;
 
-    setCurrentImage((prev) =>
-      prev === 0 ? product.images.length - 1 : prev - 1
-    );
-  };
+  setCurrentImage(prev =>
+    prev === 0 ? cleanImages.length - 1 : prev - 1
+  );
+};
 
   if (loading) {
     return (
@@ -61,6 +61,8 @@ export default function ProductDetail() {
   }
 
   if (!product) return <div className="p-20 text-center">ไม่พบสินค้า</div>;
+
+  const cleanImages = product.images?.filter(img => img && img.trim() !== "") || [];
 
   // ตรวจสอบสถานะสินค้าหมด
   const isOutOfStock = product.stock <= 0;
@@ -102,13 +104,13 @@ export default function ProductDetail() {
     <div className="bg-[#e9eff3] font-prompt min-h-screen relative">
       <div className="px-24 py-16 flex gap-16">
         {/* IMAGE */}
-        <div className="w-full lg:w-[60%] flex flex-col gap-6">          
+        <div className="w-full lg:w-[60%] flex flex-col gap-6">
           {/* Main Image Container */}
-          <div className="group w-full h-[550px] bg-white rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden relative">            
+          <div className="group w-full h-[550px] bg-white rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden relative">
             {/* Layer: Fixed Acrylic Base (แผ่นขาวที่อยู่คงที่ ไม่ต้อง Animate เพื่อลดการกระพริบ) */}
             <div className="absolute inset-0 bg-white/40 backdrop-blur-md z-0" />
 
-            {product.images && product.images.length > 0 ? (
+            {cleanImages.length > 0 ? (
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentImage}
@@ -119,15 +121,15 @@ export default function ProductDetail() {
                   className="absolute inset-0 w-full h-full flex items-center justify-center"
                 >
                   {/* Layer: Background Blur (รูปเบลอที่เปลี่ยนตามรูปจริง) */}
-                  <img 
-                    src={product.images[currentImage]} 
-                    alt="blur background" 
+                  <img
+                    src={cleanImages[currentImage]}
+                    alt="blur background"
                     className="absolute inset-0 w-full h-full object-cover blur-md scale-110"
                   />
-                  
+
                   {/* Layer: Main Image (รูปคมชัด) */}
                   <img
-                    src={product.images[currentImage]}
+                    src={cleanImages[currentImage]}
                     alt={product.name}
                     className="relative z-10 w-full h-full object-contain p-8"
                   />
@@ -138,7 +140,7 @@ export default function ProductDetail() {
             )}
 
             {/* Arrows */}
-            {product.images && product.images.length > 1 && (
+            {cleanImages.length > 1 && (
               <>
                 <button
                   onClick={prevImage}
@@ -166,23 +168,23 @@ export default function ProductDetail() {
 
           {/* Thumbnails Section: ปรับให้โชว์รูปทั้งหมดและคลิกเลือกได้ */}
           <div className="flex gap-4 overflow-x-auto py-2 scrollbar-hide justify-center">
-              {product.images?.map((img, index) => (
-              <div
-                key={index}
-                onClick={() => setCurrentImage(index)}
-                className={`w-24 h-24 min-w-[96px] rounded-xl border-2 cursor-pointer transition-all duration-200 overflow-hidden bg-white flex-shrink-0
-                  ${currentImage === index 
-                    ? "border-[#f28c45] shadow-md scale-105" 
-                    : "border-transparent hover:border-gray-200"
-                  }`}
-              >
-                <img 
-                  src={img} 
-                  alt={`thumbnail-${index}`} 
-                  className="w-full h-full object-cover" 
-                />
-              </div>
-            ))}
+            {cleanImages.map((img, index) => (
+                <div
+                  key={index}
+                  onClick={() => setCurrentImage(index)}
+                  className={`w-24 h-24 min-w-[96px] rounded-xl border-2 cursor-pointer transition-all duration-200 overflow-hidden bg-white flex-shrink-0
+                  ${currentImage === index
+                      ? "border-[#f28c45] shadow-md scale-105"
+                      : "border-transparent hover:border-gray-200"
+                    }`}
+                >
+                  <img
+                    src={img}
+                    alt={`thumbnail-${index}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
           </div>
         </div>
 
