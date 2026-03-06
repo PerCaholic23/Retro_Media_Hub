@@ -173,8 +173,8 @@ export default function Checkout() {
             <p className="text-gray-500 text-base leading-relaxed pr-32"> {/* เพิ่ม pr เพื่อไม่ให้ข้อความยาวไปทับปุ่ม */}
               {[
                 address.address,
-                address.soy && address.soy !== "-" ? `ซอย ${address.soy}` : null,
-                address.street && address.street !== "-" ? `ถนน ${address.street}` : null,
+                address.soy && address.soy !== "-" ? ` ${address.soy}` : null,
+                address.street && address.street !== "-" ? ` ${address.street}` : null,
                 address.district,
                 address.province,
                 address.postalCode
