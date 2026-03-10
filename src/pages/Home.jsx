@@ -220,7 +220,7 @@ export default function Home() {
                     </div>
                     <h3 className="font-semibold mb-2">{item.name}</h3>
                     <div className = "flex justify-between items-center">
-                      <p className="text-[#d6dee4] font-medium">{item.artist}</p>
+                      <p className="text-[#9CB0BF] font-medium">{item.artist}</p>
                       <p className="text-[#f28c45] font-semibold">฿{item.price}</p>
                     
                       </div>

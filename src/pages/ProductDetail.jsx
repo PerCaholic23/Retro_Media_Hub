@@ -78,6 +78,7 @@ const prevImage = () => {
     addToCart({
       id: product._id,
       name: product.name,
+      artist: product.artist,
       price: product.price,
       quantity: quantity,
       image: product.images?.[0],
