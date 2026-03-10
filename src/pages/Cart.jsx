@@ -60,9 +60,9 @@ export default function Cart() {
           cartItems.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-3xl p-6 flex items-center justify-between shadow-sm"
+              className="bg-white rounded-3xl p-6 flex items-center justify-between shadow-sm relative"
             >
-              <div className="flex items-center gap-6 ">
+              <div className="flex items-center gap-6 flex-1">
                 {/*Orange checkbox*/}
                 <input
                   type="checkbox"
@@ -87,7 +87,7 @@ export default function Cart() {
                 </div>
               </div>
 
-              <div>
+              <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
               <div className="flex items-center border border-gray-200 rounded-xl w-fit">
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
