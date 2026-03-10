@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import imageCompression from 'browser-image-compression';
 
 export default function CategoryPage() {
   const { slug } = useParams();
@@ -100,17 +101,35 @@ export default function CategoryPage() {
     setAlertData({ show: true, message, onConfirm });
   };
 
-  const handleImageChange = (e, index) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const updated = [...formData.previews];
-      updated[index] = reader.result;
-      setFormData(prev => ({ ...prev, previews: updated }));
-    };
-    reader.readAsDataURL(file);
+const handleImageChange = async (e, index) => { // Added async
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // --- Start Compressor ---
+  const options = {
+    maxSizeMB: 0.2,          // make this one not exceed 200kb
+    maxWidthOrHeight: 1280, 
+    useWebWorker: true,
+    fileType: 'image/webp'  //convert to webp for performance
   };
+
+  let fileToRead = file;
+  try {
+    const compressedFile = await imageCompression(file, options);
+    fileToRead = compressedFile; // Use the smaller file
+  } catch (error) {
+    console.error("Compression failed, using original", error);
+  }
+  // --- End Compressor ---
+
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    const updated = [...formData.previews];
+    updated[index] = reader.result;
+    setFormData(prev => ({ ...prev, previews: updated }));
+  };
+  reader.readAsDataURL(fileToRead); 
+};
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.artist || !formData.previews[0]) {
