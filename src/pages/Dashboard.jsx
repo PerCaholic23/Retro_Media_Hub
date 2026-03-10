@@ -22,34 +22,48 @@ export default function Dashboard() {
   });
 
   useEffect(() => {
-    // 🔥 ดึงข้อมูลจาก backend จริงภายหลัง
-    // ตอนนี้ทำ mock data ก่อน
 
-    const mockData = [
-      { month: "ม.ค.", revenue: 20000, expense: 12000 },
-      { month: "ก.พ.", revenue: 35000, expense: 0 },
-      { month: "มี.ค.", revenue: 28000, expense: 0 },
-      { month: "เม.ย.", revenue: 40000, expense: 20000 },
-      { month: "พ.ค.", revenue: 45000, expense: 22000 },
-      { month: "มิ.ย.", revenue: 16000, expense: 0 },
-    ];
+    // Inside Dashboard.jsx -> fetchDashboard function
 
-    const formatted = mockData.map(item => ({
-      ...item,
-      profit: item.revenue - item.expense
-    }));
+    const fetchDashboard = async () => {
+      const token = localStorage.getItem("token");
+      const res = await axios.get("http://localhost:5000/api/dashboard", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-    const totalRevenue = formatted.reduce((sum, i) => sum + i.revenue, 0);
-    const totalExpense = formatted.reduce((sum, i) => sum + i.expense, 0);
-    const totalProfit = totalRevenue - totalExpense;
+      const { revenueData, expenseData } = res.data;
 
-    setSummary({
-      totalRevenue,
-      totalExpense,
-      totalProfit,
-      chartData: formatted
-    });
+      const months = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      const combined = {};
 
+      revenueData.forEach(item => {
+        const m = item._id.month;
+        if (!combined[m]) combined[m] = { month: months[m], revenue: 0, expense: 0 };
+        combined[m].revenue = item.total;
+      });
+
+      expenseData.forEach(item => {
+        const m = item._id.month;
+        if (!combined[m]) combined[m] = { month: months[m], revenue: 0, expense: 0 };
+        combined[m].expense = item.total;
+      });
+
+      const finalChartData = Object.values(combined).map(item => ({
+        ...item,
+        profit: item.revenue - item.expense
+      }));
+
+      const totalRev = finalChartData.reduce((sum, i) => sum + i.revenue, 0);
+      const totalExp = finalChartData.reduce((sum, i) => sum + i.expense, 0);
+
+      setSummary({
+        totalRevenue: totalRev,
+        totalExpense: totalExp,
+        totalProfit: totalRev - totalExp,
+        chartData: finalChartData
+      });
+    };
+    fetchDashboard();
   }, []);
 
   return (

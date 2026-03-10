@@ -11,6 +11,7 @@ require("dotenv").config();
 // Models test
 const User = require("../../src/models/user");
 const Product = require("../../src/models/product");
+const Order = require("../../src/models/order")
 
 const app = express();
 
@@ -334,43 +335,118 @@ app.get("/api/product/:id", async (req, res) => {
 });
 
 /* ================================================= */
-
+/* When user order something it will trigger this section */
+/* ================================================= */
 app.post("/api/order", authMiddleware, async (req, res) => {
   try {
-    const { items } = req.body;
+
+    const { items, paymentMethod } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ message: "No items provided" });
     }
 
-    // Get first product in checkout
-    const product = await Product.findById(items[0].id)
-      .populate("owner");
+    const orderItems = [];
+    let total = 0;
 
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    // 🔥 THIS is the seller
-    const seller = product.owner;
-
-    // Reduce stock safely
     for (const item of items) {
-      const updated = await Product.findOneAndUpdate(
-        { _id: item.id, stock: { $gte: item.quantity } },
-        { $inc: { stock: -item.quantity } },
-        { new: true }
-      );
 
-      if (!updated) {
+      const product = await Product.findById(item.id).populate("owner");
+
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      if (product.stock < item.quantity) {
         return res.status(400).json({ message: "Stock not enough" });
       }
+
+      // reduce stock
+      product.stock -= item.quantity;
+      await product.save();
+
+      orderItems.push({
+        product: product._id,
+        seller: product.owner._id,
+        name: product.name,
+        artist: product.artist,
+        price: product.price,
+        quantity: item.quantity,
+        image: product.images?.[0] || ""
+      });
+
+      total += product.price * item.quantity;
     }
+
+    const order = new Order({
+      buyer: req.user.id,
+      items: orderItems,
+      total,
+      paymentMethod
+    });
+
+    await order.save();
+
+    // return seller QR (first seller for now)
+    const firstSeller = await User.findById(orderItems[0].seller);
 
     res.json({
       message: "Order created",
-      sellerQR: seller.promptpayQR
+      sellerQR: firstSeller.promptpayQR
     });
+
+  } catch (error) {
+
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+
+  }
+});
+
+/* ================================================= */
+/* For sending data to dashboard 69afb954f04075f2cac93f22
+69a00124259dcbc704369672*/ 
+/* ================================================= */
+app.get("/api/dashboard", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    //Calculate revenue
+    const revenueData = await Order.aggregate([
+      { $unwind: "$items" },
+      { 
+        $match: { 
+          "items.seller": new mongoose.Types.ObjectId(userId),
+          createdAt: { $gte: sixMonthsAgo }
+        } 
+      },
+      {
+        $group: {
+          _id: { month: { $month: "$createdAt" } },
+          total: { $sum: { $multiply: ["$items.price", "$items.quantity"] } }
+        }
+      }
+    ]);
+
+    //Calculate expense
+    const expenseData = await Order.aggregate([
+      { 
+        $match: { 
+          buyer: new mongoose.Types.ObjectId(userId),
+          createdAt: { $gte: sixMonthsAgo }
+        } 
+      },
+      {
+        $group: {
+          _id: { month: { $month: "$createdAt" } },
+          total: { $sum: "$total" }
+        }
+      }
+    ]);
+
+    res.json({ revenueData, expenseData });
 
   } catch (error) {
     console.error(error);
