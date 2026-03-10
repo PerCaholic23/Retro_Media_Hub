@@ -34,20 +34,20 @@ export default function ProductDetail() {
   }, [id]);
 
   const nextImage = () => {
-  if (!cleanImages.length) return;
+    if (!cleanImages.length) return;
 
-  setCurrentImage(prev =>
-    prev === cleanImages.length - 1 ? 0 : prev + 1
-  );
-};
+    setCurrentImage(prev =>
+      prev === cleanImages.length - 1 ? 0 : prev + 1
+    );
+  };
 
-const prevImage = () => {
-  if (!cleanImages.length) return;
+  const prevImage = () => {
+    if (!cleanImages.length) return;
 
-  setCurrentImage(prev =>
-    prev === 0 ? cleanImages.length - 1 : prev - 1
-  );
-};
+    setCurrentImage(prev =>
+      prev === 0 ? cleanImages.length - 1 : prev - 1
+    );
+  };
 
   if (loading) {
     return (
@@ -125,14 +125,16 @@ const prevImage = () => {
                   <img
                     src={cleanImages[currentImage]}
                     alt="blur background"
-                    className="absolute inset-0 w-full h-full object-cover blur-md scale-110"
+                    className={`absolute inset-0 w-full h-full object-cover blur-md scale-110 ${isOutOfStock ? "grayscale" : ""
+                      }`}
                   />
 
                   {/* Layer: Main Image (รูปคมชัด) */}
                   <img
                     src={cleanImages[currentImage]}
                     alt={product.name}
-                    className="relative z-10 w-full h-full object-contain p-8"
+                    className={`relative z-10 w-full h-full object-contain p-8 ${isOutOfStock ? "grayscale opacity-70" : ""
+                      }`}
                   />
                 </motion.div>
               </AnimatePresence>
@@ -158,34 +160,29 @@ const prevImage = () => {
               </>
             )}
 
-            {isOutOfStock && (
-              <div className="absolute inset-0 bg-white/40 flex items-center justify-center">
-                <span className="bg-black/70 text-white px-8 py-3 rounded-full text-2xl font-bold border-2 border-white">
-                  สินค้าหมด
-                </span>
-              </div>
-            )}
+
           </div>
 
           {/* Thumbnails Section: ปรับให้โชว์รูปทั้งหมดและคลิกเลือกได้ */}
           <div className="flex gap-4 overflow-x-auto py-2 scrollbar-hide justify-center">
             {cleanImages.map((img, index) => (
-                <div
-                  key={index}
-                  onClick={() => setCurrentImage(index)}
-                  className={`w-24 h-24 min-w-[96px] rounded-xl border-2 cursor-pointer transition-all duration-200 overflow-hidden bg-white flex-shrink-0
+              <div
+                key={index}
+                onClick={() => setCurrentImage(index)}
+                className={`w-24 h-24 min-w-[96px] rounded-xl border-2 cursor-pointer transition-all duration-200 overflow-hidden bg-white flex-shrink-0
                   ${currentImage === index
-                      ? "border-[#f28c45] shadow-md scale-105"
-                      : "border-transparent hover:border-gray-200"
+                    ? "border-[#f28c45] shadow-md scale-105"
+                    : "border-transparent hover:border-gray-200"
+                  }`}
+              >
+                <img
+                  src={img}
+                  alt={`thumbnail-${index}`}
+                  className={`w-full h-full object-cover ${isOutOfStock ? "grayscale opacity-60" : ""
                     }`}
-                >
-                  <img
-                    src={img}
-                    alt={`thumbnail-${index}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
+                />
+              </div>
+            ))}
           </div>
         </div>
 

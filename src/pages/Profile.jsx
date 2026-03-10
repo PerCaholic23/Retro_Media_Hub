@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import imageCompression from 'browser-image-compression';
 
 export default function Profile() {
   const [user, setUser] = useState({
@@ -56,16 +57,35 @@ export default function Profile() {
     setUser({ ...user, [name]: value });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUser({ ...user, promptpayQR: reader.result });
-      };
-      reader.readAsDataURL(file);
+
+  const handleImageChange = async (e) => { // Added async
+  const file = e.target.files[0];
+  if (file) {
+    // --- Start Compressor ---
+    const options = {
+      maxSizeMB: 0.2,          // Max size 200KB
+      maxWidthOrHeight: 1280, 
+      useWebWorker: true,
+      fileType: 'image/webp'
+    };
+
+    let fileToRead = file;
+    try {
+      const compressedFile = await imageCompression(file, options);
+      fileToRead = compressedFile;
+    } catch (error) {
+      console.error("Compression failed, using original", error);
     }
-  };
+    // --- End Compressor ---
+
+    // Your original code below, now reading 'fileToRead'
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setUser({ ...user, promptpayQR: reader.result });
+    };
+    reader.readAsDataURL(fileToRead);
+  }
+};
 
   // ===== แก้ไขส่วนบันทึกข้อมูลและกลับหน้า Home =====
   const handleSave = async () => {

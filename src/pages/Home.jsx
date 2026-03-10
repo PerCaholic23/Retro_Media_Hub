@@ -53,7 +53,7 @@ export default function Home() {
   }, [searchQuery, categoryQuery]);
 
   if (!localStorage.getItem("token")) return null;
-  
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -74,7 +74,7 @@ export default function Home() {
         <div className="flex justify-between pl-40 pr-24 py-10 relative">
           {/* ฝั่งซ้าย: ข้อความและปุ่ม */}
           <div className="w-1/2 mt-3">
-            <div className="ml-1"> 
+            <div className="ml-1">
               <h3 className="font-regular ml-40 mb-5  text-3xl">แหล่งรวม</h3>
               <h1 className="text-5xl font-regular leading-none ml-72 -mt-4">
                 <span className="text-[#f28c45]">สินค้าด้านดนตรี</span>
@@ -90,27 +90,27 @@ export default function Home() {
               ร้านค้าของคุณ
             </button> */}
             <button
-  onClick={() => navigate("/store")}
-  className="group relative mt-8 bg-[#f28c45] text-white px-10 py-4 rounded-[22px] shadow-[0_10px_25px_rgba(242,140,69,0.3)] hover:shadow-[0_20px_40px_rgba(242,140,69,0.4)] hover:scale-105 transition-all duration-500 flex items-center gap-3 overflow-hidden"
->
-  {/* เอฟเฟกต์แสงวิ่งผ่าน (Shine Effect) */}
-  <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-all duration-700 group-hover:left-[100%] skew-x-[-25deg]"></div>
+              onClick={() => navigate("/store")}
+              className="group relative mt-8 bg-[#f28c45] text-white px-10 py-4 rounded-[22px] shadow-[0_10px_25px_rgba(242,140,69,0.3)] hover:shadow-[0_20px_40px_rgba(242,140,69,0.4)] hover:scale-105 transition-all duration-500 flex items-center gap-3 overflow-hidden"
+            >
+              {/* เอฟเฟกต์แสงวิ่งผ่าน (Shine Effect) */}
+              <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-all duration-700 group-hover:left-[100%] skew-x-[-25deg]"></div>
 
-  {/* ไอคอนร้านค้า - เพิ่มลูกเล่นการหมุน/กระดก (Wobble) */}
-  <img 
-    src={ShopIcon} 
-    alt="store" 
-    className="w-7 h-7 object-contain transition-transform duration-500 group-hover:rotate-[-12deg] group-hover:scale-110" 
-  />
+              {/* ไอคอนร้านค้า - เพิ่มลูกเล่นการหมุน/กระดก (Wobble) */}
+              <img
+                src={ShopIcon}
+                alt="store"
+                className="w-7 h-7 object-contain transition-transform duration-500 group-hover:rotate-[-12deg] group-hover:scale-110"
+              />
 
-  {/* ข้อความ - ปรับ font-normal/medium ตามที่คุณชอบ */}
-  <span className="relative text-lg font-medium tracking-wide">
-    ร้านค้าของคุณ
-  </span>
+              {/* ข้อความ - ปรับ font-normal/medium ตามที่คุณชอบ */}
+              <span className="relative text-lg font-medium tracking-wide">
+                ร้านค้าของคุณ
+              </span>
 
-  {/* ลูกเล่นจุดไฟ (Glow) เล็กๆ ที่ขอบปุ่มตอน Hover */}
-  <div className="absolute inset-0 border-2 border-white/20 rounded-[22px] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-</button>
+              {/* ลูกเล่นจุดไฟ (Glow) เล็กๆ ที่ขอบปุ่มตอน Hover */}
+              <div className="absolute inset-0 border-2 border-white/20 rounded-[22px] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </button>
 
             <div className="mt-10 bg-[#d6dee4] p-6 rounded-3xl w-[420px] shadow-md">
               <h3 className="font-semibold mb-4 text-lg">รายการสินค้าแนะนำ</h3>
@@ -143,10 +143,10 @@ export default function Home() {
               onClick={() => navigate("/home?category=CD เพลง")}
               className="absolute top-[160px] left-[0px] w-[360px] h-[360px] rounded-full bg-white z-20 shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition border-4 border-white"
             >
-              <img 
-                src="https://i.pinimg.com/736x/25/67/32/256732cfc95f431a70ee49de12c328a1.jpg" 
-                alt="CD" 
-                className="w-full h-full object-cover rounded-full overflow-hidden" 
+              <img
+                src="https://i.pinimg.com/736x/25/67/32/256732cfc95f431a70ee49de12c328a1.jpg"
+                alt="CD"
+                className="w-full h-full object-cover rounded-full overflow-hidden"
               />
               <span className="absolute top-[60px] left-[-135px] bg-white px-10 py-4 rounded-2xl shadow-2xl text-black text-2xl font-black z-30 min-w-[250px] text-center">
                 CD เพลง
@@ -157,14 +157,14 @@ export default function Home() {
               text="แผ่นเสียง"
               image="https://i.pinimg.com/736x/4b/c8/6d/4bc86d00722fd941baededbae9411845.jpg"
               className="top-[-10px] left-[200px]"
-              textPosition="bottom-[100px] left-[100px] text-4xl font-black bg-white px-15 py-3 rounded-full shadow-lg min-w-[140px] text-center" 
+              textPosition="bottom-[100px] left-[100px] text-4xl font-black bg-white px-15 py-3 rounded-full shadow-lg min-w-[140px] text-center"
             />
 
             <SmallCircle
               text="เทปคาสเซ็ท"
               image="https://i.pinimg.com/1200x/00/00/99/000099d11fdec13320997e182e968f5f.jpg"
               className="top-[100px] left-[350px]"
-              textPosition="right-[-85px] top-[5px] text-4xl font-black bg-white px-15 py-3 rounded-full shadow-lg min-w-[140px] text-center" 
+              textPosition="right-[-85px] top-[5px] text-4xl font-black bg-white px-15 py-3 rounded-full shadow-lg min-w-[140px] text-center"
             />
 
             <SmallCircle
@@ -205,13 +205,23 @@ export default function Home() {
                     onClick={() => navigate(`/product/${item._id}`)}
                     className="bg-white p-6 rounded-3xl shadow-md hover:shadow-xl hover:scale-105 cursor-pointer transition"
                   >
-                    <div className="w-full aspect-square rounded-2xl overflow-hidden mb-4">
+                    <div className="w-full aspect-square rounded-2xl overflow-hidden mb-4 relative">
                       {item.images?.[0] ? (
-                        <img
-                          src={item.images[0]}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
+                        <>
+                          <img
+                            src={item.images[0]}
+                            alt={item.name}
+                            className={`w-full h-full object-cover ${item.stock === 0 ? "grayscale opacity-60" : ""
+                              }`}
+                          />
+                          {item.stock === 0 && (
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                              <span className="text-white font-bold text-sm">
+                                สินค้าหมดชั่วคราว
+                              </span>
+                            </div>
+                          )}
+                        </>
                       ) : (
                         <div className="w-full h-full bg-gray-300 flex items-center justify-center text-white">
                           No Image
@@ -219,14 +229,14 @@ export default function Home() {
                       )}
                     </div>
                     <h3 className="font-semibold mb-2">{item.name}</h3>
-                    <div className = "flex justify-between items-center">
+                    <div className="flex justify-between items-center">
                       <p className="text-[#9CB0BF] font-medium">{item.artist}</p>
                       <p className="text-[#f28c45] font-semibold">฿{item.price}</p>
-                    
-                      </div>
+
+                    </div>
 
 
-                    
+
                   </div>
                 ))
               ) : (
