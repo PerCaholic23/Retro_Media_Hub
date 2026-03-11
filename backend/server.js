@@ -9,14 +9,14 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 // Models test
-const User = require("../../src/models/user");
-const Product = require("../../src/models/product");
-const Order = require("../../src/models/order")
+const User = require("./models/user");
+const Product = require("./models/product");
+const Order = require("./models/order")
 
 const app = express();
 
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb", extended: true }));
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ limit: "5mb", extended: true }));
 app.use(cors());
 app.use("/uploads", express.static("uploads"));
 
