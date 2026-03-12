@@ -7,6 +7,9 @@ function RegisterStep2() {
   const location = useLocation();
   const step1Data = location.state;
 
+  const API = process.env.REACT_APP_API_URL;
+  console.log("API RegisterStep2.jsx ", API);
+
   const [formData, setFormData] = useState({
     fullName: "",
     address: "",
@@ -55,7 +58,7 @@ function RegisterStep2() {
     const allData = { ...step1Data, ...formData };
 
     try {
-      await axios.post("http://localhost:5000/api/register", allData);
+      await axios.post(`${API}/api/register`, allData);
 
       showModal("สมัครสมาชิกสำเร็จ", "success");
 

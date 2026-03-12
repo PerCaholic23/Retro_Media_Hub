@@ -13,11 +13,14 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState(0);
 
+  const API = process.env.REACT_APP_API_URL;
+  console.log("API ProductDetail.jsx", API);
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`http://localhost:5000/api/product/${id}`, {
+        const res = await fetch(`${API}/api/product/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();

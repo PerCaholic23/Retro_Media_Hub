@@ -12,12 +12,15 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const API = process.env.REACT_APP_API_URL;
+  console.log("API Login.jsx", API);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/login", {
+      const res = await axios.post(`${API}/api/login`, {
         email,
         password,
       });

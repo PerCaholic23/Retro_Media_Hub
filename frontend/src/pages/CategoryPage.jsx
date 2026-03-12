@@ -16,6 +16,9 @@ export default function CategoryPage() {
 
   const token = localStorage.getItem("token");
 
+  const API = process.env.REACT_APP_API_URL;
+  console.log("API URL: ", API);
+
   const [alertData, setAlertData] = useState({
     show: false,
     message: "",
@@ -57,7 +60,7 @@ export default function CategoryPage() {
   };
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/my-products/${slug}`, {
+    axios.get(`${API}/api/my-products/${slug}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => {
@@ -148,16 +151,16 @@ const handleImageChange = async (e, index) => { // Added async
         };
 
         if (isEdit) {
-          await axios.put(`http://localhost:5000/api/product/${editingId}`, payload, {
+          await axios.put(`${API}/api/product/${editingId}`, payload, {
             headers: { Authorization: `Bearer ${token}` }
           });
         } else {
-          await axios.post("http://localhost:5000/api/product", payload, {
+          await axios.post(`${API}/api/product`, payload, {
             headers: { Authorization: `Bearer ${token}` }
           });
         }
         
-        const res = await axios.get(`http://localhost:5000/api/my-products/${slug}`, {
+        const res = await axios.get(`${API}/api/my-products/${slug}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setProducts(res.data);
@@ -170,7 +173,7 @@ const handleImageChange = async (e, index) => { // Added async
     if (!selectedItems.length) return;
     showAlert("แน่ใจหรือไม่ว่าต้องการลบ?", async () => {
       await Promise.all(selectedItems.map(id =>
-        axios.delete(`http://localhost:5000/api/product/${id}`, {
+        axios.delete(`${API}/api/product/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ));

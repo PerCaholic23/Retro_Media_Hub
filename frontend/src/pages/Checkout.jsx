@@ -20,6 +20,9 @@ export default function Checkout() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [sellerQR, setSellerQR] = useState(null);
 
+  const API = process.env.REACT_APP_API_URL;
+  console.log("API checkout.jsx", API);
+
   const itemsToCheckout = directProduct
     ? [directProduct]
     : cartItems.filter((item) => item.checked);
@@ -43,7 +46,7 @@ export default function Checkout() {
 
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/auth/me", {
+        const res = await fetch(`${API}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -75,7 +78,7 @@ export default function Checkout() {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://localhost:5000/api/order", {
+      const res = await fetch(`${API}/api/order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

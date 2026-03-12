@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import ShopIcon from "../image/ShopIcon.png";
 
+
+
 export default function Home() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -10,6 +12,9 @@ export default function Home() {
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get("search") || "";
   const categoryQuery = queryParams.get("category") || "";
+
+  const API = process.env.REACT_APP_API_URL;
+  console.log("API Home.jsx ", API);
 
   const categoryName = {
     cd: "ซีดี",
@@ -42,7 +47,7 @@ export default function Home() {
         if (categoryQuery) query.append("category", categoryQuery);
 
         const res = await fetch(
-          `http://localhost:5000/api/products?${query.toString()}`,
+          `${API}/api/products?${query.toString()}`,
           {
             headers: {
               Authorization: `Bearer ${token}`

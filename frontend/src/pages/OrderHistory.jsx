@@ -7,13 +7,16 @@ export default function OrderHistory() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const API = process.env.REACT_APP_API_URL;
+  console.log("API OrderHistory.jsx", API);
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const token = localStorage.getItem("token");
         
         // เรียก API ไปยัง Backend Port 5000
-        const res = await axios.get("http://localhost:5000/api/order/my-orders", {
+        const res = await axios.get(`${API}/api/order/my-orders`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         

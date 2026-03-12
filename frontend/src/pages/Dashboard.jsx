@@ -13,6 +13,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function Dashboard() {
+  const API = process.env.REACT_APP_API_URL;
+  console.log("API Dashboard.jsx", API);
 
   const [summary, setSummary] = useState({
     totalRevenue: 0,
@@ -30,8 +32,8 @@ export default function Dashboard() {
     const fetchDashboard = async () => {
       const token = localStorage.getItem("token");
       const url = selectedMonth
-  ? `http://localhost:5000/api/dashboard?month=${selectedMonth}`
-  : `http://localhost:5000/api/dashboard`;
+  ? `${API}/api/dashboard?month=${selectedMonth}`
+  : `${API}/api/dashboard`;
 
 const res = await axios.get(url, {
   headers: { Authorization: `Bearer ${token}` }

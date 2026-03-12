@@ -22,8 +22,11 @@ export default function Store() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
 
+  const API = process.env.REACT_APP_API_URL;
+  console.log("API Store.jsx ", API);
+
   useEffect(() => {
-    axios.get("http://localhost:5000/api/category", {
+    axios.get(`${API}/api/category`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`
       }
