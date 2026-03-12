@@ -11,6 +11,16 @@ export default function Home() {
   const searchQuery = queryParams.get("search") || "";
   const categoryQuery = queryParams.get("category") || "";
 
+  const categoryName = {
+    cd: "ซีดี",
+    vinyl: "แผ่นเสียง",
+    cassette: "เทปคาสเซ็ท",
+    poster: "โปสเตอร์ศิลปิน",
+    tshirt: "เสื้อวง"
+  }
+
+  const categoryLabel = categoryName[categoryQuery] || categoryQuery;
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -140,7 +150,7 @@ export default function Home() {
           <div className="relative w-[650px] h-[650px]">
             {/* CD เพลง (อันใหญ่กลาง) */}
             <div
-              onClick={() => navigate("/home?category=CD เพลง")}
+              onClick={() => navigate("/home?category=cd")}
               className="absolute top-[160px] left-[0px] w-[360px] h-[360px] rounded-full bg-white z-20 shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition border-4 border-white"
             >
               <img
@@ -154,28 +164,32 @@ export default function Home() {
             </div>
 
             <SmallCircle
-              text="แผ่นเสียง"
+              label="แผ่นเสียง"
+              category="vinyl"
               image="https://i.pinimg.com/736x/4b/c8/6d/4bc86d00722fd941baededbae9411845.jpg"
               className="top-[-10px] left-[200px]"
               textPosition="bottom-[100px] left-[100px] text-4xl font-black bg-white px-15 py-3 rounded-full shadow-lg min-w-[140px] text-center"
             />
 
             <SmallCircle
-              text="เทปคาสเซ็ท"
+              label="เทปคาสเซ็ท"
+              category="cassette"
               image="https://i.pinimg.com/1200x/00/00/99/000099d11fdec13320997e182e968f5f.jpg"
               className="top-[100px] left-[350px]"
               textPosition="right-[-85px] top-[5px] text-4xl font-black bg-white px-15 py-3 rounded-full shadow-lg min-w-[140px] text-center"
             />
 
             <SmallCircle
-              text="โปสเตอร์ศิลปิน"
+              label="โปสเตอร์ศิลปิน"
+              category="poster"
               image="https://i.pinimg.com/736x/6e/0a/2b/6e0a2b2826c82a28084348e7a0004bbb.jpg"
               className="bottom-[220px] left-[390px]"
               textPosition="bottom-[100px] left-[100px] text-4xl font-black bg-white px-15 py-3 rounded-full shadow-lg min-w-[140px] text-center"
             />
 
             <SmallCircle
-              text="เสื้อวง"
+              label="เสื้อวง"
+              category="tshirt"
               image="https://i.pinimg.com/736x/01/03/4d/01034d08a5985dd64c0af29afda50ca6.jpg"
               className="bottom-[45px] left-[330px]"
               textPosition="bottom-[100px] left-[100px] text-4xl font-black bg-white px-15 py-3 rounded-full shadow-lg min-w-[140px] text-center"
@@ -186,6 +200,7 @@ export default function Home() {
 
       {/* ส่วนแสดงรายการสินค้าเมื่อค้นหาหรือเลือกหมวดหมู่ */}
       <div className="px-24 pb-16">
+        
         {(searchQuery || categoryQuery) && (
           <>
             <h2 className="text-2xl mb-6">
@@ -193,7 +208,7 @@ export default function Home() {
                 <>ผลการค้นหา: <span className="text-[#f28c45] font-semibold ml-2">{searchQuery}</span></>
               )}
               {!searchQuery && categoryQuery && (
-                <>หมวดหมู่: <span className="text-[#f28c45] font-semibold ml-2">{categoryQuery}</span></>
+                <>หมวดหมู่: <span className="text-[#f28c45] font-semibold ml-2">{categoryLabel}</span></>
               )}
             </h2>
 
@@ -250,22 +265,24 @@ export default function Home() {
   );
 }
 
-function SmallCircle({ text, className, image, textPosition = "bottom-[-20px]" }) {
+function SmallCircle({ label, category, className, image, textPosition = "bottom-[-20px]" }) {
   const navigate = useNavigate();
+
   return (
     <div
-      onClick={() => navigate(`/home?category=${text}`)}
+      onClick={() => navigate(`/home?category=${category}`)}
       className={`absolute flex flex-col items-center cursor-pointer hover:scale-110 transition active:scale-95 z-10 ${className}`}
     >
       <div className="w-[150px] h-[150px] rounded-full bg-white shadow-md flex items-center justify-center overflow-hidden border-2 border-gray-100 relative">
         {image ? (
-          <img src={image} alt={text} className="w-full h-full object-cover" />
+          <img src={image} alt={label} className="w-full h-full object-cover" />
         ) : (
           <span className="text-gray-400 text-xs">No Image</span>
         )}
       </div>
+
       <span className={`absolute bg-white px-4 py-1 rounded-xl shadow-md text-sm text-black whitespace-nowrap border border-gray-100 font-medium z-30 ${textPosition}`}>
-        {text}
+        {label}
       </span>
     </div>
   );
