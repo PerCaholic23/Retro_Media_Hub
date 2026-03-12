@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import platformQR from "../image/platform_qr.png";
 
 export default function Checkout() {
   const { cartItems, clearCart } = useCart();
@@ -47,7 +48,7 @@ export default function Checkout() {
         });
 
         const data = await res.json();
-        
+
         if (res.ok) setAddress(data);
       } catch (error) {
         console.error(error);
@@ -86,7 +87,12 @@ export default function Checkout() {
       });
 
       const data = await res.json();
-      setSellerQR(data.sellerQR);
+
+      if (data.qr === "platform") {
+        setSellerQR(platformQR);
+      } else {
+        setSellerQR(data.qr);
+      }
 
       if (!res.ok) {
         alert(data.message || "เกิดข้อผิดพลาด");

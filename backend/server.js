@@ -19,6 +19,7 @@ app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ limit: "5mb", extended: true }));
 app.use(cors());
 app.use("/uploads", express.static("uploads"));
+app.use("/image", express.static("platform_qr"));
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
@@ -388,11 +389,25 @@ app.post("/api/order", authMiddleware, async (req, res) => {
     await order.save();
 
     // return seller QR (first seller for now)
-    const firstSeller = await User.findById(orderItems[0].seller);
+    // find all unique sellers in the order
+    const sellerIds = [...new Set(orderItems.map(item => item.seller.toString()))];
+
+    let qrCode;
+
+    if (sellerIds.length === 1) {
+
+      const seller = await User.findById(sellerIds[0]);
+      qrCode = seller.promptpayQR;
+
+    } else {
+
+      qrCode = "platform";
+
+    }
 
     res.json({
       message: "Order created",
-      sellerQR: firstSeller.promptpayQR
+      qr: qrCode
     });
 
   } catch (error) {
@@ -405,7 +420,7 @@ app.post("/api/order", authMiddleware, async (req, res) => {
 
 /* ================================================= */
 /* For sending data to dashboard 69afb954f04075f2cac93f22
-69a00124259dcbc704369672*/ 
+69a00124259dcbc704369672*/
 /* ================================================= */
 app.get("/api/dashboard", authMiddleware, async (req, res) => {
 
@@ -452,14 +467,14 @@ app.get("/api/dashboard", authMiddleware, async (req, res) => {
   ]);
 
   const expenseData = await Order.aggregate([
-  { $match: expenseMatch },
-  {
-    $group: {
-      _id: { day: { $dayOfMonth: "$createdAt" } },
-      total: { $sum: "$total" }
+    { $match: expenseMatch },
+    {
+      $group: {
+        _id: { day: { $dayOfMonth: "$createdAt" } },
+        total: { $sum: "$total" }
+      }
     }
-  }
-]);
+  ]);
 
   res.json({ revenueData, expenseData });
 
@@ -485,7 +500,7 @@ app.get("/api/order/my-orders", authMiddleware, async (req, res) => {
   }
 });
 
-
-app.listen(5000, () => {
+const port = process.env.PORT || 5000
+app.listen(port, () => {
   console.log("Server running on port 5000");
 });
