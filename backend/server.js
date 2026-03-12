@@ -408,50 +408,61 @@ app.post("/api/order", authMiddleware, async (req, res) => {
 69a00124259dcbc704369672*/ 
 /* ================================================= */
 app.get("/api/dashboard", authMiddleware, async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-    //Calculate revenue
-    const revenueData = await Order.aggregate([
-      { $unwind: "$items" },
-      { 
-        $match: { 
-          "items.seller": new mongoose.Types.ObjectId(userId),
-          createdAt: { $gte: sixMonthsAgo }
-        } 
-      },
-      {
-        $group: {
-          _id: { month: { $month: "$createdAt" } },
-          total: { $sum: { $multiply: ["$items.price", "$items.quantity"] } }
-        }
-      }
-    ]);
+  const userId = req.user.id;
+  const { month } = req.query;
 
-    //Calculate expense
-    const expenseData = await Order.aggregate([
-      { 
-        $match: { 
-          buyer: new mongoose.Types.ObjectId(userId),
-          createdAt: { $gte: sixMonthsAgo }
-        } 
-      },
-      {
-        $group: {
-          _id: { month: { $month: "$createdAt" } },
-          total: { $sum: "$total" }
-        }
-      }
-    ]);
+  let revenueMatch = {
+    "items.seller": new mongoose.Types.ObjectId(userId)
+  };
 
-    res.json({ revenueData, expenseData });
+  let expenseMatch = {
+    buyer: new mongoose.Types.ObjectId(userId)
+  };
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+  if (month) {
+
+    revenueMatch.$expr = {
+      $eq: [{ $month: "$createdAt" }, Number(month)]
+    };
+
+    expenseMatch.$expr = {
+      $eq: [{ $month: "$createdAt" }, Number(month)]
+    };
+
+  } else {
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    revenueMatch.createdAt = { $gte: thirtyDaysAgo };
+    expenseMatch.createdAt = { $gte: thirtyDaysAgo };
+
   }
+
+  const revenueData = await Order.aggregate([
+    { $unwind: "$items" },
+    { $match: revenueMatch },
+    {
+      $group: {
+        _id: { day: { $dayOfMonth: "$createdAt" } },
+        total: { $sum: { $multiply: ["$items.price", "$items.quantity"] } }
+      }
+    }
+  ]);
+
+  const expenseData = await Order.aggregate([
+  { $match: expenseMatch },
+  {
+    $group: {
+      _id: { day: { $dayOfMonth: "$createdAt" } },
+      total: { $sum: "$total" }
+    }
+  }
+]);
+
+  res.json({ revenueData, expenseData });
+
 });
 
 

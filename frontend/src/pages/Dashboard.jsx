@@ -21,15 +21,21 @@ export default function Dashboard() {
     chartData: []
   });
 
+  const [selectedMonth, setSelectedMonth] = useState("");
+
   useEffect(() => {
 
     // Inside Dashboard.jsx -> fetchDashboard function
 
     const fetchDashboard = async () => {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/dashboard", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const url = selectedMonth
+  ? `http://localhost:5000/api/dashboard?month=${selectedMonth}`
+  : `http://localhost:5000/api/dashboard`;
+
+const res = await axios.get(url, {
+  headers: { Authorization: `Bearer ${token}` }
+});
 
       const { revenueData, expenseData } = res.data;
 
@@ -37,16 +43,24 @@ export default function Dashboard() {
       const combined = {};
 
       revenueData.forEach(item => {
-        const m = item._id.month;
-        if (!combined[m]) combined[m] = { month: months[m], revenue: 0, expense: 0 };
-        combined[m].revenue = item.total;
-      });
 
-      expenseData.forEach(item => {
-        const m = item._id.month;
-        if (!combined[m]) combined[m] = { month: months[m], revenue: 0, expense: 0 };
-        combined[m].expense = item.total;
-      });
+  const d = item._id.day;
+
+  if (!combined[d]) combined[d] = { day: d, revenue: 0, expense: 0 };
+
+  combined[d].revenue = item.total;
+
+});
+
+expenseData.forEach(item => {
+
+  const d = item._id.day;
+
+  if (!combined[d]) combined[d] = { day: d, revenue: 0, expense: 0 };
+
+  combined[d].expense = item.total;
+
+});
 
       const finalChartData = Object.values(combined).map(item => ({
         ...item,
@@ -64,7 +78,7 @@ export default function Dashboard() {
       });
     };
     fetchDashboard();
-  }, []);
+  }, [selectedMonth]);
 
   return (
     <div className="bg-[#e9eff3] min-h-screen p-20 font-prompt">
@@ -97,6 +111,28 @@ export default function Dashboard() {
 
       </div>
 
+      <select
+  value={selectedMonth}
+  onChange={(e) => setSelectedMonth(e.target.value)}
+  className="border p-2 rounded mb-6"
+>
+
+<option value="">Last 30 Days</option>
+<option value="1">January</option>
+<option value="2">February</option>
+<option value="3">March</option>
+<option value="4">April</option>
+<option value="5">May</option>
+<option value="6">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
+<option value="12">December</option>
+
+</select>
+
       {/* LINE CHART */}
       <div className="bg-white rounded-3xl p-10 shadow-md">
         <h2 className="text-2xl font-semibold mb-6">แนวโน้มรายได้</h2>
@@ -104,7 +140,7 @@ export default function Dashboard() {
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={summary.chartData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
+            <XAxis dataKey="day" />
             <YAxis />
             <Tooltip />
             <Legend />
