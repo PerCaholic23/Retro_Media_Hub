@@ -26,6 +26,8 @@ app.use(cors({
   credentials: true
 }));
 
+app.options("*", cors());
+
 app.use("/uploads", express.static("uploads"));
 app.use("/image", express.static("platform_qr"));
 
